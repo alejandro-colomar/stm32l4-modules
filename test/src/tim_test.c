@@ -20,18 +20,14 @@
 /* Standard C ----------------------------------------------------------------*/
 	#include <stdbool.h>
 	#include <stdint.h>
-
 /* Drivers -------------------------------------------------------------------*/
 	#include "stm32l4xx_hal.h"
-
 /* libalx --------------------------------------------------------------------*/
-	#include "alx_mask.h"
-
+	#include "libalx/alx_mask.h"
 /* STM32L4 modules -----------------------------------------------------------*/
 	#include "delay.h"
 	#include "errors.h"
 	#include "led.h"
-
 	#include "tim.h"
 
 	#include "tim_test.h"

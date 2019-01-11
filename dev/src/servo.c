@@ -22,17 +22,12 @@
 /* Standard C ----------------------------------------------------------------*/
 	#include <stdbool.h>
 	#include <stdint.h>
-
 /* Drivers -------------------------------------------------------------------*/
 	#include "stm32l4xx_hal.h"
-
 /* libalx --------------------------------------------------------------------*/
-		/* alx_scale_linear_f() */
-	#include "alx_math.h"
-
+	#include "libalx/alx_math.h"
 /* STM32L4 modules -----------------------------------------------------------*/
 	#include "errors.h"
-		/* pwm_init(), pwm_set(), pwm_stop() */
 	#include "pwm.h"
 
 	#include "servo.h"

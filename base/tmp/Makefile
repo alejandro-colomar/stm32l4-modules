@@ -51,7 +51,7 @@ DELAY_INC_DIRS		= -I $(INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-ERRORS_INC_LIBALX	= alx_mask.h
+ERRORS_INC_LIBALX	= libalx/alx_mask.h
 ERRORS_INC		= errors.h	delay.h led.h
 ERRORS_DEPS		= $(SRC_DIR)/errors.c \
 			$(COMMON_DEPS) \

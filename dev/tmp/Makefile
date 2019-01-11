@@ -52,7 +52,7 @@ NUNCHUK_INC_DIRS	= -I $(INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-SERVO_INC_LIBALX	= alx_math.h
+SERVO_INC_LIBALX	= libalx/alx_math.h
 SERVO_INC_BASE		= errors.h pwm.h
 SERVO_INC		= servo.h
 SERVO_DEPS		= $(SRC_DIR)/servo.c \

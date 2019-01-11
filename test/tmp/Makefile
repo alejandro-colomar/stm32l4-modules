@@ -97,7 +97,7 @@ SERVO_INC_DIRS		= -I $(INC_DIR) \
 			-I $(DEV_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
-TIM_INC_LIBALX		= alx_mask.h
+TIM_INC_LIBALX		= libalx/alx_mask.h
 TIM_INC_BASE		= delay.h led.h errors.h tim.h
 TIM_INC			= tim_test.h
 TIM_DEPS		= $(SRC_DIR)/tim_test.c \
