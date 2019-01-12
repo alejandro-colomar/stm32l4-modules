@@ -227,7 +227,7 @@ static	int	pwm_tim2_master_conf	(void)
 	TIM_MasterConfigTypeDef	master;
 
 	master.MasterOutputTrigger	= TIM_TRGO_RESET;
-/*	master.MasterOutputTrigger2	= TIM_TRGO2_RESET;*/
+	master.MasterOutputTrigger2	= TIM_TRGO2_RESET;
 	master.MasterSlaveMode		= TIM_MASTERSLAVEMODE_DISABLE;
 
 	return	HAL_TIMEx_MasterConfigSynchronization(&tim, &master);
