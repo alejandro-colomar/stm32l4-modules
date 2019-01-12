@@ -69,15 +69,20 @@ static	TIM_OC_InitTypeDef	oc_init;
 /******************************************************************************
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
-static	int	pwm_tim2_tim_init	(uint32_t resolution_sec,
+static	int	pwm_tim2_clk_conf		(void);
+static	int	pwm_tim2_tim_init		(uint32_t resolution_sec,
 								uint32_t period);
-static	int	pwm_tim2_clk_conf	(void);
-static	int	pwm_tim2_master_conf	(void);
-static	void	pwm_tim2_oc_conf	(void);
-static	void	pwm_tim2_ch1_gpio_init	(void);
-static	void	pwm_tim2_ch2_gpio_init	(void);
-static	void	pwm_tim2_ch3_gpio_init	(void);
-static	void	pwm_tim2_ch4_gpio_init	(void);
+static	int	pwm_tim2_tim_deinit		(void);
+static	int	pwm_tim2_master_conf		(void);
+static	void	pwm_tim2_oc_conf		(void);
+static	void	pwm_tim2_ch1_gpio_init		(void);
+static	void	pwm_tim2_ch1_gpio_deinit	(void);
+static	void	pwm_tim2_ch2_gpio_init		(void);
+static	void	pwm_tim2_ch2_gpio_deinit	(void);
+static	void	pwm_tim2_ch3_gpio_init		(void);
+static	void	pwm_tim2_ch3_gpio_deinit	(void);
+static	void	pwm_tim2_ch4_gpio_init		(void);
+static	void	pwm_tim2_ch4_gpio_deinit	(void);
 
 
 /******************************************************************************
@@ -92,6 +97,7 @@ static	void	pwm_tim2_ch4_gpio_init	(void);
 	 */
 int	pwm_tim2_init		(uint32_t resolution_sec, uint32_t period)
 {
+
 	if (init_pending) {
 		init_pending	= false;
 	} else {
@@ -99,25 +105,20 @@ int	pwm_tim2_init		(uint32_t resolution_sec, uint32_t period)
 	}
 
 	__HAL_RCC_TIM2_CLK_ENABLE();
-	if (pwm_tim2_tim_init(resolution_sec, period)) {
-		prj_error	|= ERROR_PWM_HAL_TIM_INIT;
-		prj_error_handle();
-		return	ERROR_NOK;
-	}
 	if (pwm_tim2_clk_conf()) {
 		prj_error	|= ERROR_PWM_HAL_TIM_CLK_CONF;
 		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_clk_conf;
+	}
+	if (pwm_tim2_tim_init(resolution_sec, period)) {
+		prj_error	|= ERROR_PWM_HAL_TIM_PWM_INIT;
+		prj_error_handle();
+		goto err_init;
 	}
 	if (pwm_tim2_master_conf()) {
 		prj_error	|= ERROR_PWM_HAL_TIM_MASTER_CONF;
 		prj_error_handle();
-		return	ERROR_NOK;
-	}
-	if (HAL_TIM_PWM_Init(&tim)) {
-		prj_error	|= ERROR_PWM_HAL_TIM_PWM_INIT;
-		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_master_conf;
 	}
 	pwm_tim2_oc_conf();
 
@@ -127,17 +128,63 @@ int	pwm_tim2_init		(uint32_t resolution_sec, uint32_t period)
 	pwm_tim2_ch4_gpio_init();
 
 	return	ERROR_OK;
+
+
+err_master_conf:
+	if (pwm_tim2_tim_deinit()) {
+		prj_error	|= ERROR_PWM_HAL_TIM_PWM_DEINIT;
+		prj_error_handle();
+	}
+
+err_init:
+err_clk_conf:
+	__HAL_RCC_TIM2_CLK_DISABLE();
+
+	return	ERROR_NOK;
+}
+
+	/**
+	 * @brief	Deinitialize PWM using TIM2
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	pwm_tim2_deinit		(void)
+{
+	int	status;
+
+	status	= ERROR_OK;
+
+	if (!init_pending) {
+		init_pending	= true;
+	} else {
+		return	status;
+	}
+
+	pwm_tim2_ch4_gpio_deinit();
+	pwm_tim2_ch3_gpio_deinit();
+	pwm_tim2_ch2_gpio_deinit();
+	pwm_tim2_ch1_gpio_deinit();
+
+	if (pwm_tim2_tim_deinit()) {
+		prj_error	|= ERROR_PWM_HAL_TIM_PWM_DEINIT;
+		prj_error_handle();
+		status	= ERROR_NOK;
+	}
+	__HAL_RCC_TIM2_CLK_DISABLE();
+
+	return	status;
 }
 
 	/**
 	 * @brief	Set PWM using TIM2
 	 * @param	duty_cycle:	duty cycle value (fraction)
-	 * @param	chan:		channel to be used (1 through 4)
+	 * @param	tim_chan:	channel to be used (1 through 4)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	pwm_tim2_chX_set	(float duty_cycle, uint32_t tim_chan)
+int	pwm_tim2_chX_set	(uint32_t tim_chan, float duty_cycle)
 {
+
 	if (init_pending) {
 		prj_error	|= ERROR_PWM_INIT;
 		prj_error_handle();
@@ -171,19 +218,21 @@ int	pwm_tim2_chX_set	(float duty_cycle, uint32_t tim_chan)
 
 	/**
 	 * @brief	Stop PWM using TIM2
+	 * @param	tim_chan:	channel to be used (1 through 4)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	pwm_tim2_stop		(void)
+int	pwm_tim2_chX_stop	(uint32_t tim_chan)
 {
+
 	if (init_pending) {
 		prj_error	|= ERROR_PWM_INIT;
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
 
-	if (HAL_TIM_Base_Stop(&tim)) {
-		prj_error	|= ERROR_PWM_HAL_TIM_STOP;
+	if (HAL_TIM_PWM_Stop(&tim, tim_chan)) {
+		prj_error	|= ERROR_PWM_HAL_TIM_PWM_STOP;
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
@@ -195,22 +244,7 @@ int	pwm_tim2_stop		(void)
 /******************************************************************************
  ******* static functions (definitions) ***************************************
  ******************************************************************************/
-static	int	pwm_tim2_tim_init	(uint32_t resolution_sec,
-								uint32_t period)
-{
-	tim.Instance		= TIM2;
-	tim.Init.Prescaler		= (SystemCoreClock / resolution_sec)
-									- 1u;
-	tim.Init.CounterMode		= TIM_COUNTERMODE_UP;
-	tim.Init.Period			= period - 1u;
-	tim.Init.ClockDivision		= TIM_CLOCKDIVISION_DIV1;
-	tim.Init.RepetitionCounter	= 0;
-	tim.Init.AutoReloadPreload	= TIM_AUTORELOAD_PRELOAD_DISABLE;
-
-	return	HAL_TIM_Base_Init(&tim);
-}
-
-static	int	pwm_tim2_clk_conf	(void)
+static	int	pwm_tim2_clk_conf		(void)
 {
 	TIM_ClockConfigTypeDef	clk;
 
@@ -222,7 +256,30 @@ static	int	pwm_tim2_clk_conf	(void)
 	return	HAL_TIM_ConfigClockSource(&tim, &clk);
 }
 
-static	int	pwm_tim2_master_conf	(void)
+static	int	pwm_tim2_tim_init		(uint32_t resolution_sec,
+								uint32_t period)
+{
+
+	tim.Instance		= TIM2;
+	tim.Init.Prescaler		= (SystemCoreClock / resolution_sec)
+									- 1u;
+	tim.Init.CounterMode		= TIM_COUNTERMODE_UP;
+	tim.Init.Period			= period - 1u;
+	tim.Init.ClockDivision		= TIM_CLOCKDIVISION_DIV1;
+	tim.Init.RepetitionCounter	= 0;
+	tim.Init.AutoReloadPreload	= TIM_AUTORELOAD_PRELOAD_DISABLE;
+
+	return	HAL_TIM_PWM_Init(&tim);
+}
+
+static	int	pwm_tim2_tim_deinit		(void)
+{
+
+	return	HAL_TIM_PWM_DeInit(&tim);
+}
+
+	/* FIXME:  Is it needed? */
+static	int	pwm_tim2_master_conf		(void)
 {
 	TIM_MasterConfigTypeDef	master;
 
@@ -233,8 +290,9 @@ static	int	pwm_tim2_master_conf	(void)
 	return	HAL_TIMEx_MasterConfigSynchronization(&tim, &master);
 }
 
-static	void	pwm_tim2_oc_conf	(void)
+static	void	pwm_tim2_oc_conf		(void)
 {
+
 	oc_init.OCMode		= TIM_OCMODE_PWM1;
 	oc_init.OCPolarity	= TIM_OCPOLARITY_HIGH;
 	oc_init.OCFastMode	= TIM_OCFAST_DISABLE;
@@ -244,7 +302,7 @@ static	void	pwm_tim2_oc_conf	(void)
 	oc_init.OCIdleState	= TIM_OCIDLESTATE_RESET;
 }
 
-static	void	pwm_tim2_ch1_gpio_init	(void)
+static	void	pwm_tim2_ch1_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
@@ -258,7 +316,13 @@ static	void	pwm_tim2_ch1_gpio_init	(void)
 	HAL_GPIO_Init(GPIOA, &gpio);
 }
 
-static	void	pwm_tim2_ch2_gpio_init	(void)
+static	void	pwm_tim2_ch1_gpio_deinit	(void)
+{
+
+	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_15);
+}
+
+static	void	pwm_tim2_ch2_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
@@ -272,7 +336,13 @@ static	void	pwm_tim2_ch2_gpio_init	(void)
 	HAL_GPIO_Init(GPIOA, &gpio);
 }
 
-static	void	pwm_tim2_ch3_gpio_init	(void)
+static	void	pwm_tim2_ch2_gpio_deinit	(void)
+{
+
+	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1);
+}
+
+static	void	pwm_tim2_ch3_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
@@ -286,7 +356,13 @@ static	void	pwm_tim2_ch3_gpio_init	(void)
 	HAL_GPIO_Init(GPIOB, &gpio);
 }
 
-static	void	pwm_tim2_ch4_gpio_init	(void)
+static	void	pwm_tim2_ch3_gpio_deinit	(void)
+{
+
+	HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10);
+}
+
+static	void	pwm_tim2_ch4_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
@@ -298,6 +374,12 @@ static	void	pwm_tim2_ch4_gpio_init	(void)
 	gpio.Speed	= GPIO_SPEED_FREQ_LOW;
 	gpio.Alternate	= GPIO_AF1_TIM2;
 	HAL_GPIO_Init(GPIOB, &gpio);
+}
+
+static	void	pwm_tim2_ch4_gpio_deinit	(void)
+{
+
+	HAL_GPIO_DeInit(GPIOB, GPIO_PIN_11);
 }
 
 

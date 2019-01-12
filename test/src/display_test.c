@@ -66,11 +66,27 @@
 	/**
 	 * @brief	Test LED matrix display
 	 * @return	Error
-	 * @note	Not available
 	 */
 int	display_test	(void)
 {
-	return	ERROR_NOK;
+	int	i;
+	char	ch;
+
+	delay_us_init();
+	display_init();
+
+	for (i = 0; i <= 9; i++) {
+		ch	= i + '0';
+
+		if (display_set_ch(ch)) {
+			return	ERROR_NOK;
+		}
+		if (delay_us(1000000u)) {
+			return	ERROR_NOK;
+		}
+	}
+
+	return	ERROR_OK;
 }
 
 

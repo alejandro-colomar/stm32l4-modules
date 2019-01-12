@@ -61,6 +61,7 @@
  ******* functions ************************************************************
  ******************************************************************************/
 int	display_init	(void);
+int	display_deinit	(void);
 int	display_set	(uint16_t data [DISPLAY_ROWS]);
 int	display_set_ch	(char ch);
 

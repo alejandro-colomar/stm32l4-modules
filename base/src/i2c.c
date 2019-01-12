@@ -61,10 +61,14 @@ static	I2C_HandleTypeDef	i2c;
  ******* static functions (declarations) **************************************
  ******************************************************************************/
 static	void	i2c_msp_init		(void);
+static	void	i2c_msp_deinit		(void);
 static	void	i2c_gpio_init		(void);
+static	void	i2c_gpio_deinit		(void);
 static	void	i2c_nvic_conf		(void);
+static	void	i2c_nvic_deconf		(void);
 
 static	int	i2c_peripherial_init	(void);
+static	int	i2c_peripherial_deinit	(void);
 static	int	i2c_filter_analog_conf	(void);
 #if 0
 static	int	i2c_filter_digital_conf	(void);
@@ -81,6 +85,7 @@ static	int	i2c_filter_digital_conf	(void);
 	 */
 int	i2c_init	(void)
 {
+
 	if (init_pending) {
 		init_pending	= false;
 	} else {
@@ -92,21 +97,58 @@ int	i2c_init	(void)
 	if (i2c_peripherial_init()) {
 		prj_error	|= ERROR_I2C_HAL_I2C_INIT;
 		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_peripherial;
 	}
 	if (i2c_filter_analog_conf()) {
 		prj_error	|= ERROR_I2C_HAL_I2C_FILTER_A;
 		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_filter;
 	}
 #if 0
 	if (i2c_filter_digital_conf()) {
 		prj_error	|= ERROR_I2C_HAL_I2C_FILTER_D;
 		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_filter;
 	}
 #endif
 
+
+	return	ERROR_OK;
+
+
+err_filter:
+	if (i2c_peripherial_deinit()) {
+		prj_error	|= ERROR_I2C_HAL_I2C_DEINIT;
+		prj_error_handle();
+	}
+
+err_peripherial:
+	i2c_msp_deinit();
+
+	return	ERROR_NOK;
+}
+
+	/**
+	 * @brief	Denitialize I2C
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	i2c_deinit	(void)
+{
+
+	if (!init_pending) {
+		init_pending	= true;
+	} else {
+		return	ERROR_OK;
+	}
+
+	if (i2c_peripherial_deinit()) {
+		prj_error	|= ERROR_I2C_HAL_I2C_DEINIT;
+		prj_error_handle();
+		return	ERROR_NOK;
+	}
+
+	i2c_msp_deinit();
 
 	return	ERROR_OK;
 }
@@ -118,6 +160,7 @@ int	i2c_init	(void)
 	 */
 int	i2c_chk_slave	(uint8_t addr)
 {
+
 	if (init_pending) {
 		if (i2c_init()) {
 			prj_error	|= ERROR_I2C_INIT;
@@ -178,6 +221,7 @@ int	i2c_msg_write	(uint8_t addr, uint8_t data_len, uint8_t data [data_len])
 	 */
 int	i2c_msg_ask	(uint8_t addr, uint8_t data_len)
 {
+
 	if (init_pending) {
 		if (i2c_init()) {
 			prj_error	|= ERROR_I2C_INIT;
@@ -202,6 +246,7 @@ int	i2c_msg_ask	(uint8_t addr, uint8_t data_len)
 	 */
 bool	i2c_msg_ready	(void)
 {
+
 	return	(HAL_I2C_STATE_READY == HAL_I2C_GetState(&i2c));
 }
 
@@ -246,6 +291,7 @@ int	i2c_msg_read	(uint8_t data_len, uint8_t data [data_len])
 	 */
 void	I2C1_EV_IRQHandler		(void)
 {
+
 	HAL_I2C_EV_IRQHandler(&i2c);
 }
 
@@ -254,6 +300,7 @@ void	I2C1_EV_IRQHandler		(void)
 	 */
 void	I2C1_ER_IRQHandler		(void)
 {
+
 	HAL_I2C_ER_IRQHandler(&i2c);
 }
 
@@ -263,9 +310,18 @@ void	I2C1_ER_IRQHandler		(void)
  ******************************************************************************/
 static	void	i2c_msp_init		(void)
 {
+
 	__HAL_RCC_I2C1_CLK_ENABLE();
 	i2c_gpio_init();
 	i2c_nvic_conf();
+}
+
+static	void	i2c_msp_deinit		(void)
+{
+
+	i2c_nvic_deconf();
+	i2c_gpio_deinit();
+	__HAL_RCC_I2C1_CLK_DISABLE();
 }
 
 static	void	i2c_gpio_init		(void)
@@ -282,14 +338,28 @@ static	void	i2c_gpio_init		(void)
 	HAL_GPIO_Init(GPIOB, &gpio);
 }
 
+static	void	i2c_gpio_deinit		(void)
+{
+
+	HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6 | GPIO_PIN_7);
+}
+
 static	void	i2c_nvic_conf		(void)
 {
+
 	HAL_NVIC_SetPriority(I2C1_EV_IRQn, I2C_PRIORITY, I2C_SUBPRIORITY);
 	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
 }
 
+static	void	i2c_nvic_deconf		(void)
+{
+
+	HAL_NVIC_DisableIRQ(I2C1_EV_IRQn);
+}
+
 static	int	i2c_peripherial_init	(void)
 {
+
 	i2c.Instance		= I2C1;
 	i2c.Init.Timing			= I2C_TIMING;
 	i2c.Init.OwnAddress1		= I2C_ADDRESS;
@@ -302,14 +372,22 @@ static	int	i2c_peripherial_init	(void)
 	return	HAL_I2C_Init(&i2c);
 }
 
+static	int	i2c_peripherial_deinit	(void)
+{
+
+	return	HAL_I2C_DeInit(&i2c);
+}
+
 static	int	i2c_filter_analog_conf	(void)
 {
+
 	return	HAL_I2CEx_ConfigAnalogFilter(&i2c, I2C_ANALOGFILTER_ENABLE);
 }
 
 #if 0
 static	int	i2c_filter_digital_conf	(void)
 {
+
 	return	HAL_I2CEx_ConfigDigitalFilter(&i2c, 0);
 }
 #endif

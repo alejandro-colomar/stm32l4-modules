@@ -28,7 +28,7 @@
 /* STM32L4 modules -----------------------------------------------------------*/
 	#include "delay.h"
 	#include "errors.h"
-
+	#include "led.h"
 	#include "servo.h"
 
 	#include "servo_test.h"
@@ -70,6 +70,20 @@ static	int	servo_test_position	(float pos);
 	 * @brief	Test servos
 	 * @return	Error
 	 */
+int	servo_test_0	(void)
+{
+
+	if (servo_init()) {
+		return	ERROR_NOK;
+	}
+
+	return	ERROR_OK;
+}
+
+	/**
+	 * @brief	Test servos
+	 * @return	Error
+	 */
 int	servo_test_1	(void)
 {
 	int	i;
@@ -79,6 +93,11 @@ int	servo_test_1	(void)
 	}
 
 	for (i = 00; i <= 90; i+=10) {
+		led_set();
+		delay_us(100000u);
+		led_reset();
+		delay_us(100000u);
+
 		if (servo_test_position(-i)) {
 			return	ERROR_NOK;
 		}
@@ -112,12 +131,22 @@ int	servo_test_2	(void)
 	}
 
 	for (i = -90; i <= 90; i+=10) {
+		led_set();
+		delay_us(100000u);
+		led_reset();
+		delay_us(100000u);
+
 		if (servo_test_position(i)) {
 			return	ERROR_NOK;
 		}
 	}
 
 	for (i = 90; i >= -90; i-=10) {
+		led_set();
+		delay_us(200000u);
+		led_reset();
+		delay_us(200000u);
+
 		if (servo_test_position(i)) {
 			return	ERROR_NOK;
 		}

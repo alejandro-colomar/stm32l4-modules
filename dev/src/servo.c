@@ -27,9 +27,9 @@
 /* libalx --------------------------------------------------------------------*/
 	#include "libalx/alx_math.h"
 /* STM32L4 modules -----------------------------------------------------------*/
+	#include "led.h"
 	#include "errors.h"
 	#include "pwm.h"
-
 	#include "servo.h"
 
 
@@ -42,8 +42,6 @@
 		/* Period = 20 ms = 20000 us */
 	# define	SERVO_PWM_PERIOD_us		(20000u)
 
-		/* Angle = 0 deg -> Duty time = 1.5 ms -> Duty cycle = 0.075 */
-	# define	SERVO_PWM_DUTY_DEF		(0.075f)
 		/* Angle = -90 deg -> Duty time = 1 ms -> Duty cycle = 0.05 */
 	# define	SERVO_PWM_DUTY_MIN		(0.020f)/*(0.05f) (from datashit)*/
 		/* Angle = 90 deg -> Duty time = 2 ms -> Duty cycle = 0.1 */
@@ -86,6 +84,7 @@ static	int	servo_duty_calc	(float position, float *duty);
 	 */
 int	servo_init		(void)
 {
+
 	if (init_pending) {
 		init_pending	= false;
 	} else {
@@ -95,31 +94,75 @@ int	servo_init		(void)
 	if (pwm_tim2_init(SERVO_PWM_RESOLUTION_s, SERVO_PWM_PERIOD_us)) {
 		prj_error	|= ERROR_SERVO_PWM_INIT;
 		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_init;
 	}
 
-	if (pwm_tim2_chX_set(SERVO_PWM_DUTY_DEF, TIM_CHANNEL_1)) {
-		prj_error	|= ERROR_SERVO_PWM_SET;
-		prj_error_handle();
-		return	ERROR_NOK;
+	if (servo_position_set(SERVO_S1, SERVO_ANGLE_DEF)) {
+		goto err_ch_set;
 	}
-	if (pwm_tim2_chX_set(SERVO_PWM_DUTY_DEF, TIM_CHANNEL_2)) {
-		prj_error	|= ERROR_SERVO_PWM_SET;
-		prj_error_handle();
-		return	ERROR_NOK;
+	if (servo_position_set(SERVO_S2, SERVO_ANGLE_DEF)) {
+		goto err_ch_set;
 	}
-	if (pwm_tim2_chX_set(SERVO_PWM_DUTY_DEF, TIM_CHANNEL_3)) {
-		prj_error	|= ERROR_SERVO_PWM_SET;
-		prj_error_handle();
-		return	ERROR_NOK;
+	if (servo_position_set(SERVO_S3, SERVO_ANGLE_DEF)) {
+		goto err_ch_set;
 	}
-	if (pwm_tim2_chX_set(SERVO_PWM_DUTY_DEF, TIM_CHANNEL_4)) {
-		prj_error	|= ERROR_SERVO_PWM_SET;
-		prj_error_handle();
-		return	ERROR_NOK;
+	if (servo_position_set(SERVO_S4, SERVO_ANGLE_DEF)) {
+		goto err_ch_set;
 	}
 
 	return	ERROR_OK;
+
+
+err_ch_set:
+	servo_stop(SERVO_S4);
+	servo_stop(SERVO_S3);
+	servo_stop(SERVO_S2);
+	servo_stop(SERVO_S1);
+err_init:
+	if (pwm_tim2_deinit()) {
+		prj_error	|= ERROR_SERVO_PWM_DEINIT;
+		prj_error_handle();
+	}
+
+	return	ERROR_NOK;
+}
+
+	/**
+	 * @brief	Deinit servos
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	servo_deinit		(void)
+{
+	int	status;
+
+	status	= ERROR_OK;
+
+	if (!init_pending) {
+		init_pending	= true;
+	} else {
+		return	status;
+	}
+
+	if (servo_stop(SERVO_S4)) {
+		status	= ERROR_NOK;
+	}
+	if (servo_stop(SERVO_S3)) {
+		status	= ERROR_NOK;
+	}
+	if (servo_stop(SERVO_S2)) {
+		status	= ERROR_NOK;
+	}
+	if (servo_stop(SERVO_S1)) {
+		status	= ERROR_NOK;
+	}
+	if (pwm_tim2_deinit()) {
+		prj_error	|= ERROR_SERVO_PWM_DEINIT;
+		prj_error_handle();
+		status	= ERROR_NOK;
+	}
+
+	return	status;
 }
 
 	/**
@@ -161,7 +204,7 @@ int	servo_position_set	(int8_t servo, float position)
 	}
 
 	servo_duty_calc(position, &duty_cycle[servo]);
-	if (pwm_tim2_chX_set(duty_cycle[servo], tim_chan)) {
+	if (pwm_tim2_chX_set(tim_chan, duty_cycle[servo])) {
 		prj_error	|= ERROR_SERVO_PWM_SET;
 		prj_error_handle();
 		return	ERROR_NOK;
@@ -171,23 +214,47 @@ int	servo_position_set	(int8_t servo, float position)
 }
 
 	/**
-	 * @brief	Stop servos
+	 * @brief	Stop servo sX
+	 * @param	servo:	servo to stop
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	servo_stop		(void)
+int	servo_stop		(int8_t servo)
 {
+	uint32_t	tim_chan;
+
 	if (init_pending) {
-		return	ERROR_OK;
+		if (servo_init()) {
+			prj_error	|= ERROR_SERVO_INIT;
+			prj_error_handle();
+			return	ERROR_NOK;
+		}
 	}
 
-	if (pwm_tim2_stop()) {
-		prj_error	|= ERROR_SERVO_PWM_STOP;
+	switch (servo) {
+	case SERVO_S1:
+		tim_chan	= TIM_CHANNEL_1;
+		break;
+	case SERVO_S2:
+		tim_chan	= TIM_CHANNEL_2;
+		break;
+	case SERVO_S3:
+		tim_chan	= TIM_CHANNEL_3;
+		break;
+	case SERVO_S4:
+		tim_chan	= TIM_CHANNEL_4;
+		break;
+	default:
+		prj_error	|= ERROR_SERVO_ID;
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
 
-	init_pending	= true;
+	if (pwm_tim2_chX_stop(tim_chan)) {
+		prj_error	|= ERROR_SERVO_PWM_STOP;
+		prj_error_handle();
+		return	ERROR_NOK;
+	}
 
 	return	ERROR_OK;
 }

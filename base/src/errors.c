@@ -18,12 +18,17 @@
 /* Standard C ----------------------------------------------------------------*/
 	#include <stdbool.h>
 	#include <stdint.h>
+
 /* Drivers -------------------------------------------------------------------*/
 	#include "stm32l4xx_hal.h"
+
 /* libalx --------------------------------------------------------------------*/
 	#include "libalx/alx_mask.h"
+
 /* STM32L4 modules -----------------------------------------------------------*/
+		/* delay_us_init(), delay_us() */
 	#include "delay.h"
+		/* led_init(), led_set(), led_stop() */
 	#include "led.h"
 
 	#include "errors.h"

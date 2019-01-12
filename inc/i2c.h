@@ -64,6 +64,7 @@
  ******* functions ************************************************************
  ******************************************************************************/
 int	i2c_init	(void);
+int	i2c_deinit	(void);
 int	i2c_chk_slave	(uint8_t addr);
 int	i2c_msg_write	(uint8_t addr, uint8_t data_len, uint8_t data [data_len]);
 int	i2c_msg_ask	(uint8_t addr, uint8_t data_len);

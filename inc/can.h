@@ -59,6 +59,7 @@
  ******* functions ************************************************************
  ******************************************************************************/
 int	can_init	(void);
+int	can_deinit	(void);
 int	can_msg_write	(uint8_t data [CAN_DATA_LEN]);
 int	can_msg_read	(uint8_t data [CAN_DATA_LEN]);
 

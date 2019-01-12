@@ -58,8 +58,9 @@
  ******* functions ************************************************************
  ******************************************************************************/
 int	pwm_tim2_init		(uint32_t resolution_sec, uint32_t period);
-int	pwm_tim2_chX_set	(float duty_cycle, uint32_t tim_chan);
-int	pwm_tim2_stop		(void);
+int	pwm_tim2_deinit		(void);
+int	pwm_tim2_chX_set	(uint32_t tim_chan, float duty_cycle);
+int	pwm_tim2_chX_stop	(uint32_t tim_chan);
 
 
 /******************************************************************************

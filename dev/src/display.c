@@ -185,21 +185,219 @@
 /* Volatile ------------------------------------------------------------------*/
 /* Global --------------------------------------------------------------------*/
 /* Static --------------------------------------------------------------------*/
+static	bool	init_pending	= true;
 
 
 /******************************************************************************
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
+static	int	display_start		(void);
+static	int	display_data_set	(char ch, uint16_t data [DISPLAY_ROWS]);
 
 
 /******************************************************************************
  ******* global functions *****************************************************
  ******************************************************************************/
+	/**
+	 * @brief	Init LED matrix display using SPI
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	display_init	(void)
+{
+
+	if (init_pending) {
+		init_pending	= false;
+	} else {
+		return	ERROR_OK;
+	}
+
+	if (spi_init()) {
+		prj_error	|= ERROR_DISPLAY_SPI_INIT;
+		prj_error_handle();
+		goto err_init;
+	}
+	if (display_start()) {
+		prj_error	|= ERROR_DISPLAY_START;
+		prj_error_handle();
+		goto err_display;
+	}
+
+	return	ERROR_OK;
+
+
+err_display:
+	if (spi_deinit()) {
+		prj_error	|= ERROR_DISPLAY_SPI_DEINIT;
+		prj_error_handle();
+	}
+err_init:
+
+	return	ERROR_NOK;
+}
+
+	/**
+	 * @brief	Deinit LED matrix display using SPI
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	display_deinit	(void)
+{
+	int	status;
+
+	status	= ERROR_OK;
+
+	if (!init_pending) {
+		init_pending	= true;
+	} else {
+		return	status;
+	}
+
+	if (spi_deinit()) {
+		prj_error	|= ERROR_DISPLAY_SPI_DEINIT;
+		prj_error_handle();
+		status	= ERROR_NOK;
+	}
+
+	return	status;
+}
+
+	/**
+	 * @brief	Set the display manually
+	 * @param	data:	Data to be sent to display
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	display_set	(uint16_t data [DISPLAY_ROWS])
+{
+	int		i;
+
+	if (init_pending) {
+		if (display_init()) {
+			prj_error	|= ERROR_DISPLAY_INIT;
+			prj_error_handle();
+			return	ERROR_NOK;
+		}
+	}
+
+	for (i = 0; i < DISPLAY_ROWS; i++) {
+		if (spi_msg_write(data[i])) {
+			prj_error	|= ERROR_DISPLAY_SPI_MSG_WRITE;
+			prj_error_handle();
+			return	ERROR_NOK;
+		}
+	}
+
+	return	ERROR_OK;
+}
+
+	/**
+	 * @brief	Show ch on the display
+	 * @param	ch:	Character to be displayed
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	display_set_ch	(char ch)
+{
+	uint16_t	data [DISPLAY_ROWS];
+
+	if (init_pending) {
+		if (display_init()) {
+			prj_error	|= ERROR_DISPLAY_INIT;
+			prj_error_handle();
+			return	ERROR_NOK;
+		}
+	}
+
+	if (display_data_set(ch, data)) {
+		prj_error	|= ERROR_DISPLAY_CHAR;
+		prj_error_handle();
+		return	ERROR_NOK;
+	}
+
+	display_set(data);
+
+	return	ERROR_OK;
+}
 
 
 /******************************************************************************
  ******* static functions (definitions) ***************************************
  ******************************************************************************/
+static	int	display_start		(void)
+{
+
+	if (spi_msg_write(DISPLAY_CODE_DISABLE_MAX7219)) {
+		return	ERROR_NOK;
+	}
+
+	if (spi_msg_write(DISPLAY_CODE_DISABLE_TEST_MODE)) {
+		return	ERROR_NOK;
+	}
+
+	if (spi_msg_write(DISPLAY_CODE_ENABLE_8_DIGITS)) {
+		return	ERROR_NOK;
+	}
+
+	if (spi_msg_write(DISPLAY_CODE_SET_MAX_BRIGHTNESS)) {
+		return	ERROR_NOK;
+	}
+
+	if (spi_msg_write(DISPLAY_CODE_DISABLE_BCD_MODE)) {
+		return	ERROR_NOK;
+	}
+
+	if (spi_msg_write(DISPLAY_CODE_ENABLE_MAX7219)) {
+		return	ERROR_NOK;
+	}
+
+	return	ERROR_OK;
+}
+
+static	int	display_data_set	(char ch, uint16_t data [DISPLAY_ROWS])
+{
+
+	switch (ch) {
+	case '0':
+		memcpy(data, DISPLAY_DATA_CHAR_0, sizeof(DISPLAY_DATA_CHAR_0));
+		break;
+	case '1':
+		memcpy(data, DISPLAY_DATA_CHAR_1, sizeof(DISPLAY_DATA_CHAR_1));
+		break;
+	case '2':
+		memcpy(data, DISPLAY_DATA_CHAR_2, sizeof(DISPLAY_DATA_CHAR_2));
+		break;
+	case '3':
+		memcpy(data, DISPLAY_DATA_CHAR_3, sizeof(DISPLAY_DATA_CHAR_3));
+		break;
+	case '4':
+		memcpy(data, DISPLAY_DATA_CHAR_4, sizeof(DISPLAY_DATA_CHAR_4));
+		break;
+	case '5':
+		memcpy(data, DISPLAY_DATA_CHAR_5, sizeof(DISPLAY_DATA_CHAR_5));
+		break;
+	case '6':
+		memcpy(data, DISPLAY_DATA_CHAR_6, sizeof(DISPLAY_DATA_CHAR_6));
+		break;
+	case '7':
+		memcpy(data, DISPLAY_DATA_CHAR_7, sizeof(DISPLAY_DATA_CHAR_7));
+		break;
+	case '8':
+		memcpy(data, DISPLAY_DATA_CHAR_8, sizeof(DISPLAY_DATA_CHAR_8));
+		break;
+	case '9':
+		memcpy(data, DISPLAY_DATA_CHAR_9, sizeof(DISPLAY_DATA_CHAR_9));
+		break;
+	case ' ':
+		memcpy(data, DISPLAY_DATA_CHAR_BLANK, sizeof(DISPLAY_DATA_CHAR_BLANK));
+		break;
+	default:
+		memcpy(data, DISPLAY_DATA_CHAR_BLANK, sizeof(DISPLAY_DATA_CHAR_BLANK));
+		return	ERROR_NOK;
+	}
+
+	return	ERROR_OK;
+}
 
 
 /******************************************************************************

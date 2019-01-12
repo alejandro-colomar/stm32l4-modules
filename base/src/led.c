@@ -60,6 +60,7 @@ static	bool	init_pending	= true;
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
 static	void	led_gpio_init	(void);
+static	void	led_gpio_deinit	(void);
 
 
 /******************************************************************************
@@ -70,6 +71,7 @@ static	void	led_gpio_init	(void);
 	 */
 void	led_init	(void)
 {
+
 	if (init_pending) {
 		init_pending	= false;
 	} else {
@@ -82,10 +84,28 @@ void	led_init	(void)
 }
 
 	/**
+	 * @brief	Deinit LED in GPIO_PIN_5
+	 */
+void	led_deinit	(void)
+{
+
+	if (!init_pending) {
+		init_pending	= true;
+	} else {
+		return;
+	}
+
+	led_reset();
+
+	led_gpio_deinit();
+}
+
+	/**
 	 * @brief	LED on
 	 */
 void	led_set		(void)
 {
+
 	if (init_pending) {
 		led_init();
 	}
@@ -98,6 +118,7 @@ void	led_set		(void)
 	 */
 void	led_reset	(void)
 {
+
 	if (init_pending) {
 		led_init();
 	}
@@ -120,6 +141,12 @@ static	void	led_gpio_init	(void)
 	gpio.Pull	= GPIO_NOPULL;
 	gpio.Speed	= GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOA, &gpio);
+}
+
+static	void	led_gpio_deinit	(void)
+{
+
+	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5);
 }
 
 

@@ -63,6 +63,7 @@ static	TIM_HandleTypeDef	tim;
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
 static	int	delay_us_tim_init	(void);
+static	int	delay_us_tim_deinit	(void);
 static	void	delay_us_delay_init	(uint32_t time_us, uint32_t *overflows);
 static	void	delay_us_delay_loop	(uint32_t overflows);
 
@@ -77,6 +78,7 @@ static	void	delay_us_delay_loop	(uint32_t overflows);
 	 */
 int	delay_us_init	(void)
 {
+
 	if (init_pending) {
 		init_pending	= false;
 	} else {
@@ -87,10 +89,43 @@ int	delay_us_init	(void)
 	if (delay_us_tim_init()) {
 		prj_error	|= ERROR_DELAY_HAL_TIM_INIT;
 		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_init;
 	}
 
 	return	ERROR_OK;
+
+
+err_init:
+	__HAL_RCC_TIM6_CLK_DISABLE();
+
+	return	ERROR_NOK;
+}
+
+	/**
+	 * @brief	Deinitialize base time for delay_us()
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	delay_us_deinit	(void)
+{
+	int	status;
+
+	status	= ERROR_OK;
+
+	if (!init_pending) {
+		init_pending	= true;
+	} else {
+		return	status;
+	}
+
+	if (delay_us_tim_deinit()) {
+		prj_error	|= ERROR_DELAY_HAL_TIM_DEINIT;
+		prj_error_handle();
+		status	= ERROR_NOK;
+	}
+	__HAL_RCC_TIM6_CLK_DISABLE();
+
+	return	status;
 }
 
 	/**
@@ -138,12 +173,13 @@ int	delay_us	(uint32_t time_us)
 /******************************************************************************
  ******* static functions (definitions) ***************************************
  ******************************************************************************/
+	/* Resolution: 1 us */
 static	int	delay_us_tim_init	(void)
 {
-	/* Resolution: 1 us */
+
 	tim.Instance		= TIM6; 
-	tim.Init.Prescaler		= (SystemCoreClock /
-							RESOLUTION_1_US) - 1u;
+	tim.Init.Prescaler		= (SystemCoreClock / RESOLUTION_1_US) -
+									1u;
 	tim.Init.CounterMode		= TIM_COUNTERMODE_UP;
 	tim.Init.Period			= UINT16_MAX;
 	tim.Init.ClockDivision		= TIM_CLOCKDIVISION_DIV1;
@@ -151,6 +187,12 @@ static	int	delay_us_tim_init	(void)
 	tim.Init.AutoReloadPreload	= TIM_AUTORELOAD_PRELOAD_DISABLE;
 
 	return	HAL_TIM_Base_Init(&tim);
+}
+
+static	int	delay_us_tim_deinit	(void)
+{
+
+	return	HAL_TIM_Base_DeInit(&tim);
 }
 
 static	void	delay_us_delay_init	(uint32_t time_us, uint32_t *overflows)

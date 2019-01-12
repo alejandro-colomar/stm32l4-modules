@@ -96,6 +96,7 @@ static	void	nunchuk_extract_data	(uint8_t buff [NUNCHUK_DATA_LEN],
 	 */
 int	nunchuk_init	(void)
 {
+
 	if (init_pending) {
 		init_pending	= false;
 	} else {
@@ -105,20 +106,57 @@ int	nunchuk_init	(void)
 	if (i2c_init()) {
 		prj_error	|= ERROR_NUNCHUK_I2C_INIT;
 		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_init;
 	}
 	if (i2c_chk_slave(NUNCHUK_ADDRESS)) {
-		prj_error	|= ERROR_NUNCHUK_I2C_INIT;
+		prj_error	|= ERROR_NUNCHUK_I2C_SLAVE;
 		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_slave;
 	}
 	if (nunchuk_start()) {
 		prj_error	|= ERROR_NUNCHUK_START;
 		prj_error_handle();
-		return	ERROR_NOK;
+		goto err_nunchuk;
 	}
 
 	return	ERROR_OK;
+
+
+err_nunchuk:
+err_slave:
+	if (i2c_deinit()) {
+		prj_error	|= ERROR_NUNCHUK_I2C_DEINIT;
+		prj_error_handle();
+	}
+err_init:
+
+	return	ERROR_NOK;
+}
+
+	/**
+	 * @brief	Deinit nunchuk
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	nunchuk_deinit	(void)
+{
+	int	status;
+
+	status	= ERROR_OK;
+
+	if (!init_pending) {
+		init_pending	= true;
+	} else {
+		return	status;
+	}
+
+	if (i2c_deinit()) {
+		prj_error	|= ERROR_NUNCHUK_I2C_DEINIT;
+		prj_error_handle();
+		status	= ERROR_NOK;
+	}
+
+	return	status;
 }
 
 	/**
@@ -146,6 +184,7 @@ int	nunchuk_read	(Nunchuk_Data_s *data)
 		return	ERROR_NOK;
 	}
 	while (!i2c_msg_ready()) {
+//		__WFI();
 		__NOP();
 	}
 
@@ -155,6 +194,7 @@ int	nunchuk_read	(Nunchuk_Data_s *data)
 		return	ERROR_NOK;
 	}
 	while (!i2c_msg_ready()) {
+//		__WFI();
 		__NOP();
 	}
 
@@ -178,6 +218,7 @@ int	nunchuk_read	(Nunchuk_Data_s *data)
  ******************************************************************************/
 static	int	nunchuk_start		(void)
 {
+
 	if (i2c_msg_write(NUNCHUK_ADDRESS, NUNCHUK_COMMAND_START_0_LEN,
 						NUNCHUK_COMMAND_START_0_DATA)) {
 		prj_error	|= ERROR_NUNCHUK_I2C_TRANSMIT;
@@ -185,6 +226,7 @@ static	int	nunchuk_start		(void)
 		return	ERROR_NOK;
 	}
 	while (!i2c_msg_ready()) {
+//		__WFI();
 		__NOP();
 	}
 
@@ -195,6 +237,7 @@ static	int	nunchuk_start		(void)
 		return	ERROR_NOK;
 	}
 	while (!i2c_msg_ready()) {
+//		__WFI();
 		__NOP();
 	}
 
@@ -205,6 +248,7 @@ static	int	nunchuk_start		(void)
 		return	ERROR_NOK;
 	}
 	while (!i2c_msg_ready()) {
+//		__WFI();
 		__NOP();
 	}
 
@@ -225,6 +269,7 @@ static	void	nunchuk_decrypt		(uint8_t buff [NUNCHUK_DATA_LEN])
 static	void	nunchuk_extract_data	(uint8_t buff [NUNCHUK_DATA_LEN],
 						Nunchuk_Data_s  *data)
 {
+
 	data->jst.x	= buff[0];
 	data->jst.y	= buff[1];
 	data->acc.x8	= buff[2];

@@ -62,7 +62,8 @@ extern	volatile	bool	tim_tim3_interrupt;
 /******************************************************************************
  ******* functions ************************************************************
  ******************************************************************************/
-int	tim_tim3_init		(uint32_t freq_hz);
+int	tim_tim3_init		(uint16_t period_us);
+int	tim_tim3_deinit		(void);
 int	tim_callback_push	(int (*func)(void *), void *data);
 int	tim_callback_pop	(void);
 int	tim_callback_exe	(void);

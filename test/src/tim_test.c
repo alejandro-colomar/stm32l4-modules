@@ -72,28 +72,29 @@ static	int	execution_loop	(void);
  ******************************************************************************/
 	/**
 	 * @brief	Test TIM periodic interrupts
-	 * @param	freq_hz:	frequency of the interrupts
+	 * @param	period_us:	period of the interrupts
 	 * @return	Error
 	 */
-int	tim_test	(uint32_t freq_hz)
+int	tim_test	(void)
 {
 	Tim_Test_Data_s	tim_test_data;
 
-	tim_test_data.period_us	= (1.0 / freq_hz) * 1000000;
+	tim_test_data.period_us	= 65000;
 
 	if (delay_us_init()) {
 		return	ERROR_NOK;
 	}
 	led_init();
+	if (tim_tim3_init(tim_test_data.period_us)) {
+		return	ERROR_NOK;
+	}
 
 	if (tim_callback_push(&flash, (void *)&tim_test_data)) {
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
-	while (true) {
-		if (execution_loop()) {
-			return	ERROR_NOK;
-		}
+	if (execution_loop()) {
+		return	ERROR_NOK;
 	}
 
 	return	ERROR_OK;
@@ -110,10 +111,10 @@ static	int	flash		(void *data)
 	data_cast	= (Tim_Test_Data_s *)data;
 
 	led_set();
-	delay_us(data_cast->period_us * 0.1);
+	delay_us(data_cast->period_us * 0.3);
 
 	led_reset();
-	delay_us(data_cast->period_us * 0.1);
+	delay_us(data_cast->period_us * 0.3);
 
 
 	return	ERROR_OK;
@@ -121,16 +122,13 @@ static	int	flash		(void *data)
 
 static	int	execution_loop	(void)
 {
-	int	i;
-
-	for (i = 0; i <= 10;) {
-//		__WFE();
+	while (true) {
+		__WFI();
 		if (tim_tim3_interrupt) {
 			if (tim_callback_exe()) {
 				return	ERROR_NOK;
 			}
 			tim_tim3_interrupt	= false;
-			i++;
 		}
 	}
 

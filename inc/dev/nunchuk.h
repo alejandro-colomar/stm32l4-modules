@@ -81,6 +81,7 @@ typedef	struct Nunchuk_Data	Nunchuk_Data_s;
  ******* functions ************************************************************
  ******************************************************************************/
 int	nunchuk_init	(void);
+int	nunchuk_deinit	(void);
 int	nunchuk_read	(Nunchuk_Data_s *data);
 
 
