@@ -17,21 +17,17 @@
 /******************************************************************************
  ******* headers **************************************************************
  ******************************************************************************/
-/* Standard C ----------------------------------------------------------------*/
 	#include <stdbool.h>
 	#include <stdint.h>
 
-/* Drivers -------------------------------------------------------------------*/
 	#include "stm32l4xx_hal.h"
 
-/* libalx --------------------------------------------------------------------*/
-/* STM32L4 modules -----------------------------------------------------------*/
-/*	#include "delay.h"*/
-/*	#include "led.h"*/
-	#include "errors.h"
-	#include "i2c.h"
+	#include "stm32l4-modules/delay.h"
+	#include "stm32l4-modules/led.h"
+	#include "stm32l4-modules/errors.h"
+	#include "stm32l4-modules/i2c.h"
 
-	#include "nunchuk.h"
+	#include "stm32l4-modules/dev/nunchuk.h"
 
 
 

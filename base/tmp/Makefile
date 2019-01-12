@@ -27,7 +27,8 @@ COMMON_INC_DIRS		= \
 			-I $(STM32L4_HAL_INC_DIR)
 
 
-CAN_INC			= can.h	errors.h
+CAN_INC			= stm32l4-modules/can.h	\
+				stm32l4-modules/errors.h
 CAN_DEPS		= $(SRC_DIR)/can.c \
 			$(COMMON_DEPS) \
 			$(patsubst %,$(INC_DIR)/%,$(CAN_INC))
@@ -35,7 +36,8 @@ CAN_INC_DIRS		= -I $(INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-CLK_INC			= clk.h	errors.h
+CLK_INC			= stm32l4-modules/clk.h	\
+				stm32l4-modules/errors.h
 CLK_DEPS		= $(SRC_DIR)/clk.c \
 			$(COMMON_DEPS) \
 			$(patsubst %,$(INC_DIR)/%,$(CLK_INC))
@@ -43,7 +45,8 @@ CLK_INC_DIRS		= -I $(INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-DELAY_INC		= delay.h	errors.h
+DELAY_INC		= stm32l4-modules/delay.h \
+				stm32l4-modules/errors.h
 DELAY_DEPS		= $(SRC_DIR)/delay.c \
 			$(COMMON_DEPS) \
 			$(patsubst %,$(INC_DIR)/%,$(DELAY_INC))
@@ -52,7 +55,9 @@ DELAY_INC_DIRS		= -I $(INC_DIR) \
 
 
 ERRORS_INC_LIBALX	= libalx/alx_mask.h
-ERRORS_INC		= errors.h	delay.h led.h
+ERRORS_INC		= stm32l4-modules/errors.h \
+				stm32l4-modules/delay.h \
+				stm32l4-modules/led.h
 ERRORS_DEPS		= $(SRC_DIR)/errors.c \
 			$(COMMON_DEPS) \
 			$(patsubst %,$(LIBALX_INC_DIR)/%,$(ERRORS_INC_LIBALX)) \
@@ -62,7 +67,8 @@ ERRORS_INC_DIRS		= -I $(INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-I2C_INC			= i2c.h	errors.h
+I2C_INC			= stm32l4-modules/i2c.h	\
+				stm32l4-modules/errors.h
 I2C_DEPS		= $(SRC_DIR)/i2c.c \
 			$(COMMON_DEPS) \
 			$(patsubst %,$(INC_DIR)/%,$(I2C_INC))
@@ -70,8 +76,8 @@ I2C_INC_DIRS		= -I $(INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-LED_INC_ERRORS		= errors.h
-LED_INC			= led.h
+LED_INC			= stm32l4-modules/led.h \
+				stm32l4-modules/errors.h
 LED_DEPS		= $(SRC_DIR)/led.c \
 			$(COMMON_DEPS) \
 			$(patsubst %,$(INC_DIR)/%,$(LED_INC))
@@ -79,32 +85,29 @@ LED_INC_DIRS		= -I $(INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-PWM_INC			= pwm.h	errors.h
+PWM_INC			= stm32l4-modules/pwm.h	\
+				stm32l4-modules/errors.h
 PWM_DEPS		= $(SRC_DIR)/pwm.c \
 			$(COMMON_DEPS) \
-			$(patsubst %,$(LIBALX_INC_DIR)/%,$(PWM_INC_LIBALX)) \
 			$(patsubst %,$(INC_DIR)/%,$(PWM_INC))
 PWM_INC_DIRS		= -I $(INC_DIR) \
-			-I $(LIBALX_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-SPI_INC			= spi.h	errors.h
+SPI_INC			= stm32l4-modules/spi.h	\
+				stm32l4-modules/errors.h
 SPI_DEPS		= $(SRC_DIR)/spi.c \
 			$(COMMON_DEPS) \
-			$(patsubst %,$(LIBALX_INC_DIR)/%,$(SPI_INC_LIBALX)) \
 			$(patsubst %,$(INC_DIR)/%,$(SPI_INC))
 SPI_INC_DIRS		= -I $(INC_DIR) \
-			-I $(LIBALX_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
-TIM_INC			= tim.h	errors.h
+TIM_INC			= stm32l4-modules/tim.h	\
+				stm32l4-modules/errors.h
 TIM_DEPS		= $(SRC_DIR)/tim.c \
 			$(COMMON_DEPS) \
-			$(patsubst %,$(LIBALX_INC_DIR)/%,$(TIM_INC_LIBALX)) \
 			$(patsubst %,$(INC_DIR)/%,$(TIM_INC))
 TIM_INC_DIRS		= -I $(INC_DIR) \
-			-I $(LIBALX_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 # target: dependencies

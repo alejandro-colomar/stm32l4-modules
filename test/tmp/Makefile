@@ -7,13 +7,8 @@ STM32_CMSIS_INC_DIR	= $(STM32_CMSIS_DIR)/Include/
 STM32L4_CMSIS_INC_DIR	= $(STM32L4_CMSIS_DIR)/Include/
 STM32L4_HAL_INC_DIR	= $(STM32L4_HAL_DIR)/Inc/
 
-BASE_SRC_DIR	= $(STM32L4_MODULES_DIR)/base/src/
-BASE_INC_DIR	= $(STM32L4_MODULES_DIR)/inc/
-DEV_SRC_DIR	= $(STM32L4_MODULES_DIR)/dev/src/
-DEV_INC_DIR	= $(STM32L4_MODULES_DIR)/inc/dev/
-
 SRC_DIR = $(STM32L4_MODULES_DIR)/test/src/
-INC_DIR = $(STM32L4_MODULES_DIR)/inc/test/
+INC_DIR = $(STM32L4_MODULES_DIR)/inc/
 
 # dependencies
 
@@ -34,80 +29,76 @@ COMMON_INC_DIRS		= \
 			-I $(STM32L4_HAL_INC_DIR)
 
 
-CAN_INC_BASE		= can.h delay.h errors.h led.h
-CAN_INC			= can_test.h
+CAN_INC			= stm32l4-modules/test/can_test.h \
+				stm32l4-modules/can.h \
+				stm32l4-modules/delay.h \
+				stm32l4-modules/errors.h \
+				stm32l4-modules/led.h
 CAN_DEPS		= $(SRC_DIR)/can_test.c \
 			$(COMMON_DEPS) \
-			$(patsubst %,$(BASE_INC_DIR)/%,$(CAN_INC_BASE)) \
 			$(patsubst %,$(INC_DIR)/%,$(CAN_INC))
 CAN_INC_DIRS		= -I $(INC_DIR) \
-			-I $(BASE_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-DISPLAY_INC_BASE	= delay.h errors.h
-DISPLAY_INC_DEV		= display.h
-DISPLAY_INC		= display_test.h
+DISPLAY_INC		= stm32l4-modules/test/display_test.h \
+				stm32l4-modules/dev/display.h \
+				stm32l4-modules/delay.h \
+				stm32l4-modules/errors.h
 DISPLAY_DEPS		= $(SRC_DIR)/display_test.c \
 			$(COMMON_DEPS) \
-			$(patsubst %,$(BASE_INC_DIR)/%,$(DISPLAY_INC_BASE)) \
-			$(patsubst %,$(DEV_INC_DIR)/%,$(DISPLAY_INC_DEV)) \
 			$(patsubst %,$(INC_DIR)/%,$(DISPLAY_INC))
 DISPLAY_INC_DIRS	= -I $(INC_DIR) \
-			-I $(BASE_INC_DIR) \
-			-I $(DEV_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-LED_INC_BASE		= delay.h errors.h led.h
-LED_INC			= led_test.h
+LED_INC			= stm32l4-modules/test/led_test.h \
+				stm32l4-modules/delay.h \
+				stm32l4-modules/errors.h \
+				stm32l4-modules/led.h
 LED_DEPS		= $(SRC_DIR)/led_test.c \
 			$(COMMON_DEPS) \
-			$(patsubst %,$(BASE_INC_DIR)/%,$(LED_INC_BASE)) \
 			$(patsubst %,$(INC_DIR)/%,$(LED_INC))
 LED_INC_DIRS		= -I $(INC_DIR) \
-			-I $(BASE_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-NUNCHUK_INC_BASE	= delay.h errors.h led.h
-NUNCHUK_INC_DEV		= display.h nunchuk.h servo.h
-NUNCHUK_INC		= nunchuk_test.h
+NUNCHUK_INC		= stm32l4-modules/test/nunchuk_test.h \
+				stm32l4-modules/dev/display.h \
+				stm32l4-modules/dev/nunchuk.h \
+				stm32l4-modules/dev/servo.h \
+				stm32l4-modules/delay.h \
+				stm32l4-modules/errors.h \
+				stm32l4-modules/led.h
 NUNCHUK_DEPS		= $(SRC_DIR)/nunchuk_test.c \
 			$(COMMON_DEPS) \
-			$(patsubst %,$(BASE_INC_DIR)/%,$(NUNCHUK_INC_BASE)) \
-			$(patsubst %,$(DEV_INC_DIR)/%,$(NUNCHUK_INC_DEV)) \
 			$(patsubst %,$(INC_DIR)/%,$(NUNCHUK_INC))
 NUNCHUK_INC_DIRS	= -I $(INC_DIR) \
-			-I $(BASE_INC_DIR) \
-			-I $(DEV_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-SERVO_INC_BASE		= delay.h errors.h
-SERVO_INC_DEV		= servo.h
-SERVO_INC		= servo_test.h
+SERVO_INC		= stm32l4-modules/test/servo_test.h \
+				stm32l4-modules/dev/servo.h \
+				stm32l4-modules/delay.h \
+				stm32l4-modules/errors.h
 SERVO_DEPS		= $(SRC_DIR)/servo_test.c \
 			$(COMMON_DEPS) \
-			$(patsubst %,$(BASE_INC_DIR)/%,$(SERVO_INC_BASE)) \
-			$(patsubst %,$(DEV_INC_DIR)/%,$(SERVO_INC_DEV)) \
 			$(patsubst %,$(INC_DIR)/%,$(SERVO_INC))
 SERVO_INC_DIRS		= -I $(INC_DIR) \
-			-I $(BASE_INC_DIR) \
-			-I $(DEV_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 TIM_INC_LIBALX		= libalx/alx_mask.h
-TIM_INC_BASE		= delay.h led.h errors.h tim.h
-TIM_INC			= tim_test.h
+TIM_INC			= stm32l4-modules/test/tim_test.h \
+				stm32l4-modules/delay.h \
+				stm32l4-modules/led.h \
+				stm32l4-modules/errors.h \
+				stm32l4-modules/tim.h
 TIM_DEPS		= $(SRC_DIR)/tim_test.c \
 			$(COMMON_DEPS) \
 			$(patsubst %,$(LIBALX_INC_DIR)/%,$(TIM_TST_INC_LIBALX)) \
-			$(patsubst %,$(BASE_INC_DIR)/%,$(TIM_INC_BASE)) \
 			$(patsubst %,$(INC_DIR)/%,$(TIM_INC))
 TIM_INC_DIRS		= -I $(INC_DIR) \
 			-I $(LIBALX_INC_DIR) \
-			-I $(BASE_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 

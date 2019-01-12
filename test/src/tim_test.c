@@ -17,20 +17,19 @@
 /******************************************************************************
  ******* headers **************************************************************
  ******************************************************************************/
-/* Standard C ----------------------------------------------------------------*/
 	#include <stdbool.h>
 	#include <stdint.h>
-/* Drivers -------------------------------------------------------------------*/
-	#include "stm32l4xx_hal.h"
-/* libalx --------------------------------------------------------------------*/
-	#include "libalx/alx_mask.h"
-/* STM32L4 modules -----------------------------------------------------------*/
-	#include "delay.h"
-	#include "errors.h"
-	#include "led.h"
-	#include "tim.h"
 
-	#include "tim_test.h"
+	#include "stm32l4xx_hal.h"
+
+	#include "libalx/alx_mask.h"
+
+	#include "stm32l4-modules/delay.h"
+	#include "stm32l4-modules/errors.h"
+	#include "stm32l4-modules/led.h"
+	#include "stm32l4-modules/tim.h"
+
+	#include "stm32l4-modules/test/tim_test.h"
 
 
 /******************************************************************************
@@ -46,10 +45,6 @@
 /******************************************************************************
  ******* structs **************************************************************
  ******************************************************************************/
-struct	Tim_Test_Data {
-	float	period_us;
-};
-typedef	struct Tim_Test_Data	Tim_Test_Data_s;
 
 
 /******************************************************************************
@@ -63,8 +58,8 @@ typedef	struct Tim_Test_Data	Tim_Test_Data_s;
 /******************************************************************************
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
-static	int	flash		(void *data);
-static	int	execution_loop	(void);
+static	void	flash		(float period_us);
+static	int	execution_loop	(float period_us);
 
 
 /******************************************************************************
@@ -77,23 +72,19 @@ static	int	execution_loop	(void);
 	 */
 int	tim_test	(void)
 {
-	Tim_Test_Data_s	tim_test_data;
+	float	period_us;
 
-	tim_test_data.period_us	= 65000;
+	period_us	= 65000u;
 
 	if (delay_us_init()) {
 		return	ERROR_NOK;
 	}
 	led_init();
-	if (tim_tim3_init(tim_test_data.period_us)) {
+	if (tim_tim3_init(period_us)) {
 		return	ERROR_NOK;
 	}
 
-	if (tim_callback_push(&flash, (void *)&tim_test_data)) {
-		prj_error_handle();
-		return	ERROR_NOK;
-	}
-	if (execution_loop()) {
+	if (execution_loop(period_us)) {
 		return	ERROR_NOK;
 	}
 
@@ -104,30 +95,24 @@ int	tim_test	(void)
 /******************************************************************************
  ******* static functions (definitions) ***************************************
  ******************************************************************************/
-static	int	flash		(void *data)
+static	void	flash		(float period_us)
 {
-	Tim_Test_Data_s	*data_cast;
-
-	data_cast	= (Tim_Test_Data_s *)data;
 
 	led_set();
-	delay_us(data_cast->period_us * 0.3);
-
+	delay_us(period_us * 0.3);
 	led_reset();
-	delay_us(data_cast->period_us * 0.3);
-
-
-	return	ERROR_OK;
+	delay_us(period_us * 0.3);
 }
 
-static	int	execution_loop	(void)
+static	int	execution_loop	(float period_us)
 {
+
 	while (true) {
 		__WFI();
+
 		if (tim_tim3_interrupt) {
-			if (tim_callback_exe()) {
-				return	ERROR_NOK;
-			}
+			flash(period_us);
+
 			tim_tim3_interrupt	= false;
 		}
 	}
