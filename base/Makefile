@@ -8,10 +8,10 @@ TMP_DIR = $(MODULES_BASE_DIR)/tmp/
 #	action
 
 all:
-	$(Q)make -C $(TMP_DIR)
+	$(Q)$(MAKE) -C $(TMP_DIR)
 
 clean:
-	$(Q)make clean -C $(TMP_DIR)
+	$(Q)$(MAKE) clean -C $(TMP_DIR)
 
 ################################################################################
 ######## End of file ###########################################################
