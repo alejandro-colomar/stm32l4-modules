@@ -66,9 +66,7 @@ static	void	i2c_nvic_deconf		(void);
 static	int	i2c_peripherial_init	(void);
 static	int	i2c_peripherial_deinit	(void);
 static	int	i2c_filter_analog_conf	(void);
-#if 0
 static	int	i2c_filter_digital_conf	(void);
-#endif
 
 
 /******************************************************************************
@@ -100,13 +98,11 @@ int	i2c_init	(void)
 		prj_error_handle();
 		goto err_filter;
 	}
-#if 0
 	if (i2c_filter_digital_conf()) {
 		prj_error	|= ERROR_I2C_HAL_I2C_FILTER_D;
 		prj_error_handle();
 		goto err_filter;
 	}
-#endif
 
 
 	return	ERROR_OK;
@@ -380,13 +376,11 @@ static	int	i2c_filter_analog_conf	(void)
 	return	HAL_I2CEx_ConfigAnalogFilter(&i2c, I2C_ANALOGFILTER_ENABLE);
 }
 
-#if 0
 static	int	i2c_filter_digital_conf	(void)
 {
 
 	return	HAL_I2CEx_ConfigDigitalFilter(&i2c, 0);
 }
-#endif
 
 
 /******************************************************************************
