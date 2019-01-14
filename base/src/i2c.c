@@ -31,13 +31,49 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-	# define	I2C_TIMING	(0xF0330309u)
-	# define	I2C_ADDRESS	(0x00u)
-	# define	I2C_BUFF_SIZE	(UINT8_MAX)
-	# define	I2C_PRIORITY	(1)
-	# define	I2C_SUBPRIORITY	(1)
-	# define	I2C_TRIALS	(10)
-	# define	I2C_TIMEOUT	(10000)
+# define	I2Cx_TRIALS				(10)
+# define	I2Cx_TIMEOUT				(10000)
+
+# define	I2Cx_INSTANCE				(I2C1)
+# define	I2Cx_CLK_ENABLE()			__HAL_RCC_I2C1_CLK_ENABLE()
+# define	I2Cx_CLK_DISABLE()			__HAL_RCC_I2C1_CLK_DISABLE()
+
+# define	I2Cx_GPIO_MODE				(GPIO_MODE_AF_OD)
+# define	I2Cx_GPIO_PULL				(GPIO_NOPULL)
+# define	I2Cx_GPIO_SPEED				(GPIO_SPEED_FREQ_VERY_HIGH)
+
+# define	I2Cx_SCL_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOB_CLK_ENABLE()
+# define	I2Cx_SCL_GPIO_PORT			(GPIOB)
+# define	I2Cx_SCL_GPIO_PIN			(GPIO_PIN_6)
+# define	I2Cx_SCL_GPIO_MODE			(I2Cx_GPIO_MODE)
+# define	I2Cx_SCL_GPIO_PULL			(I2Cx_GPIO_PULL)
+# define	I2Cx_SCL_GPIO_SPEED			(I2Cx_GPIO_SPEED)
+# define	I2Cx_SCL_GPIO_ALT			(GPIO_AF4_I2C1)
+
+# define	I2Cx_SDA_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOB_CLK_ENABLE()
+# define	I2Cx_SDA_GPIO_PORT			(GPIOB)
+# define	I2Cx_SDA_GPIO_PIN			(GPIO_PIN_7)
+# define	I2Cx_SDA_GPIO_MODE			(I2Cx_GPIO_MODE)
+# define	I2Cx_SDA_GPIO_PULL			(I2Cx_GPIO_PULL)
+# define	I2Cx_SDA_GPIO_SPEED			(I2Cx_GPIO_SPEED)
+# define	I2Cx_SDA_GPIO_ALT			(GPIO_AF4_I2C1)
+
+# define	I2Cx_EV_IRQHandler			I2C1_EV_IRQHandler
+# define	I2Cx_ER_IRQHandler			I2C1_ER_IRQHandler
+# define	I2Cx_EV_IRQn				(I2C1_EV_IRQn)
+# define	I2Cx_PREEMPT_PRIORITY			(1)
+# define	I2Cx_SUB_PRIORITY			(1)
+
+# define	I2Cx_INIT_TIMING			(0xF0330309u)
+# define	I2Cx_INIT_OWN_ADRESS_1			(0x00u)
+# define	I2Cx_INIT_ADDRESSING_MODE		(I2C_ADDRESSINGMODE_7BIT)
+# define	I2Cx_INIT_DUAL_ADDRESS_MODE		(I2C_DUALADDRESS_DISABLE)
+# define	I2Cx_INIT_OWN_ADRESS_2			(I2Cx_INIT_OWN_ADRESS_1)
+# define	I2Cx_INIT_GENERAL_CALL_MODE		(I2C_GENERALCALL_DISABLE)
+# define	I2Cx_INIT_NO_STRETCH_MODE		(I2C_NOSTRETCH_DISABLE)
+
+# define	I2Cx_FILTER_A_CONF			(I2C_ANALOGFILTER_ENABLE)
+# define	I2Cx_FILTER_D_CONF			(0)
 
 
 /******************************************************************************
@@ -178,7 +214,7 @@ int	i2c_chk_slave	(uint8_t addr)
 		}
 	}
 
-	if (HAL_I2C_IsDeviceReady(&i2c, addr << 1, I2C_TRIALS, I2C_TIMEOUT)) {
+	if (HAL_I2C_IsDeviceReady(&i2c, addr << 1, I2Cx_TRIALS, I2Cx_TIMEOUT)) {
 		prj_error	|= ERROR_I2C_NOT_READY;
 		prj_error_handle();
 		return	ERROR_NOK;
@@ -254,7 +290,7 @@ int	i2c_msg_read	(uint8_t addr, uint8_t data_len, uint8_t buff [data_len])
 	/**
 	 * @brief	Handle I2C event interrupt request
 	 */
-void	I2C1_EV_IRQHandler		(void)
+void	I2Cx_EV_IRQHandler		(void)
 {
 
 	HAL_I2C_EV_IRQHandler(&i2c);
@@ -263,7 +299,7 @@ void	I2C1_EV_IRQHandler		(void)
 	/**
 	 * @brief	Handle I2C error interrupt request.
 	 */
-void	I2C1_ER_IRQHandler		(void)
+void	I2Cx_ER_IRQHandler		(void)
 {
 
 	HAL_I2C_ER_IRQHandler(&i2c);
@@ -276,7 +312,7 @@ void	I2C1_ER_IRQHandler		(void)
 static	void	i2c_msp_init		(void)
 {
 
-	__HAL_RCC_I2C1_CLK_ENABLE();
+	I2Cx_CLK_ENABLE();
 	i2c_gpio_init();
 	i2c_nvic_conf();
 }
@@ -286,53 +322,61 @@ static	void	i2c_msp_deinit		(void)
 
 	i2c_nvic_deconf();
 	i2c_gpio_deinit();
-	__HAL_RCC_I2C1_CLK_DISABLE();
+	I2Cx_CLK_DISABLE();
 }
 
 static	void	i2c_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
-	__HAL_RCC_GPIOB_CLK_ENABLE();
+	I2Cx_SCL_GPIO_CLK_ENABLE();
+	gpio.Pin	= I2Cx_SCL_GPIO_PIN;
+	gpio.Mode	= I2Cx_SCL_GPIO_MODE;
+	gpio.Pull	= I2Cx_SCL_GPIO_PULL;
+	gpio.Speed	= I2Cx_SCL_GPIO_SPEED;
+	gpio.Alternate	= I2Cx_SCL_GPIO_ALT;
+	HAL_GPIO_Init(I2Cx_SCL_GPIO_PORT, &gpio);
 
-	gpio.Pin	= GPIO_PIN_6 | GPIO_PIN_7;
-	gpio.Mode	= GPIO_MODE_AF_OD;
-	gpio.Speed	= GPIO_SPEED_FREQ_VERY_HIGH;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Alternate	= GPIO_AF4_I2C1;
-	HAL_GPIO_Init(GPIOB, &gpio);
+	I2Cx_SDA_GPIO_CLK_ENABLE();
+	gpio.Pin	= I2Cx_SDA_GPIO_PIN;
+	gpio.Mode	= I2Cx_SCL_GPIO_MODE;
+	gpio.Pull	= I2Cx_SDA_GPIO_PULL;
+	gpio.Speed	= I2Cx_SDA_GPIO_SPEED;
+	gpio.Alternate	= I2Cx_SDA_GPIO_ALT;
+	HAL_GPIO_Init(I2Cx_SDA_GPIO_PORT, &gpio);
 }
 
 static	void	i2c_gpio_deinit		(void)
 {
 
-	HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6 | GPIO_PIN_7);
+	HAL_GPIO_DeInit(I2Cx_SCL_GPIO_PORT, I2Cx_SCL_GPIO_PIN);
+	HAL_GPIO_DeInit(I2Cx_SDA_GPIO_PORT, I2Cx_SDA_GPIO_PIN);
 }
 
 static	void	i2c_nvic_conf		(void)
 {
 
-	HAL_NVIC_SetPriority(I2C1_EV_IRQn, I2C_PRIORITY, I2C_SUBPRIORITY);
-	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+	HAL_NVIC_SetPriority(I2Cx_EV_IRQn, I2Cx_PREEMPT_PRIORITY, I2Cx_SUB_PRIORITY);
+	HAL_NVIC_EnableIRQ(I2Cx_EV_IRQn);
 }
 
 static	void	i2c_nvic_deconf		(void)
 {
 
-	HAL_NVIC_DisableIRQ(I2C1_EV_IRQn);
+	HAL_NVIC_DisableIRQ(I2Cx_EV_IRQn);
 }
 
 static	int	i2c_peripherial_init	(void)
 {
 
-	i2c.Instance		= I2C1;
-	i2c.Init.Timing			= I2C_TIMING;
-	i2c.Init.OwnAddress1		= I2C_ADDRESS;
-	i2c.Init.AddressingMode		= I2C_ADDRESSINGMODE_7BIT;
-	i2c.Init.DualAddressMode	= I2C_DUALADDRESS_DISABLE;
-	i2c.Init.OwnAddress2		= I2C_ADDRESS;
-	i2c.Init.GeneralCallMode	= I2C_GENERALCALL_DISABLE;
-	i2c.Init.NoStretchMode		= I2C_NOSTRETCH_DISABLE;
+	i2c.Instance		= I2Cx_INSTANCE;
+	i2c.Init.Timing			= I2Cx_INIT_TIMING;
+	i2c.Init.OwnAddress1		= I2Cx_INIT_OWN_ADRESS_1;
+	i2c.Init.AddressingMode		= I2Cx_INIT_ADDRESSING_MODE;
+	i2c.Init.DualAddressMode	= I2Cx_INIT_DUAL_ADDRESS_MODE;
+	i2c.Init.OwnAddress2		= I2Cx_INIT_OWN_ADRESS_2;
+	i2c.Init.GeneralCallMode	= I2Cx_INIT_GENERAL_CALL_MODE;
+	i2c.Init.NoStretchMode		= I2Cx_INIT_NO_STRETCH_MODE;
 
 	return	HAL_I2C_Init(&i2c);
 }
@@ -346,13 +390,13 @@ static	int	i2c_peripherial_deinit	(void)
 static	int	i2c_filter_analog_conf	(void)
 {
 
-	return	HAL_I2CEx_ConfigAnalogFilter(&i2c, I2C_ANALOGFILTER_ENABLE);
+	return	HAL_I2CEx_ConfigAnalogFilter(&i2c, I2Cx_FILTER_A_CONF);
 }
 
 static	int	i2c_filter_digital_conf	(void)
 {
 
-	return	HAL_I2CEx_ConfigDigitalFilter(&i2c, 0);
+	return	HAL_I2CEx_ConfigDigitalFilter(&i2c, I2Cx_FILTER_D_CONF);
 }
 
 
