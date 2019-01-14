@@ -55,7 +55,6 @@
  ******************************************************************************/
 /* Volatile ------------------------------------------------------------------*/
 /* Global --------------------------------------------------------------------*/
-	uint8_t			i2c_buff [I2C_BUFF_SIZE];
 /* Static --------------------------------------------------------------------*/
 static	bool			init_pending	= true;
 static	I2C_HandleTypeDef	i2c;
@@ -227,7 +226,7 @@ int	i2c_msg_write	(uint8_t addr, uint8_t data_len, const uint8_t data [data_len]
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	i2c_msg_ask	(uint8_t addr, uint8_t data_len)
+int	i2c_msg_read	(uint8_t addr, uint8_t data_len, uint8_t buff [data_len])
 {
 
 	if (init_pending) {
@@ -239,42 +238,10 @@ int	i2c_msg_ask	(uint8_t addr, uint8_t data_len)
 	}
 
 	/* XXX:  << 1 is because of HAL bug */
-	if (HAL_I2C_Master_Receive_IT(&i2c, addr << 1, i2c_buff, data_len)) {
+	if (HAL_I2C_Master_Receive_IT(&i2c, addr << 1, buff, data_len)) {
 		prj_error	|= ERROR_I2C_RECEIVE;
 		prj_error_handle();
 		return	ERROR_NOK;
-	}
-
-	return	ERROR_OK;
-}
-
-	/**
-	 * @brief	Read the data received
-	 * @param	data_len:	length of data
-	 * @param	data:		array where data is to be written
-	 * @return	Error
-	 * @note	i2c_msg_ask() should have been called before
-	 * @note	Sets global variable 'prj_error'
-	 */
-int	i2c_msg_read	(uint8_t data_len, uint8_t data [data_len])
-{
-	int	i;
-
-	if (init_pending) {
-		if (i2c_init()) {
-			prj_error	|= ERROR_I2C_INIT;
-			prj_error_handle();
-			return	ERROR_NOK;
-		}
-	}
-
-	if (!i2c_ready()) {
-		prj_error	|= ERROR_I2C_NOT_READY;
-		return	ERROR_NOK;
-	}
-
-	for (i = 0; i < data_len; i++) {
-		data[i]	= i2c_buff[i];
 	}
 
 	return	ERROR_OK;

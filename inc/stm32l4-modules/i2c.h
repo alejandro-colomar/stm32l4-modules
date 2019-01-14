@@ -56,8 +56,7 @@ int	i2c_deinit	(void);
 bool	i2c_ready	(void);
 int	i2c_chk_slave	(uint8_t addr);
 int	i2c_msg_write	(uint8_t addr, uint8_t data_len, const uint8_t data [data_len]);
-int	i2c_msg_ask	(uint8_t addr, uint8_t data_len);
-int	i2c_msg_read	(uint8_t data_len, uint8_t data [data_len]);
+int	i2c_msg_read	(uint8_t addr, uint8_t data_len, uint8_t buff [data_len]);
 
 
 /******************************************************************************

@@ -75,9 +75,6 @@ static	bool	init_pending	= true;
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
 static	int	nunchuk_start		(void);
-#if 0
-static	void	nunchuk_decrypt		(uint8_t buff [NUNCHUK_DATA_LEN]);
-#endif
 static	void	nunchuk_extract_data	(uint8_t buff [NUNCHUK_DATA_LEN],
 						Nunchuk_Data_s  *data);
 
@@ -185,7 +182,7 @@ int	nunchuk_read	(Nunchuk_Data_s *data)
 		__NOP();
 	}
 
-	if (i2c_msg_ask(NUNCHUK_ADDRESS, NUNCHUK_DATA_LEN)) {
+	if (i2c_msg_read(NUNCHUK_ADDRESS, NUNCHUK_DATA_LEN, buff)) {
 		prj_error	|= ERROR_NUNCHUK_I2C_ASK;
 		prj_error_handle();
 		return	ERROR_NOK;
@@ -195,15 +192,6 @@ int	nunchuk_read	(Nunchuk_Data_s *data)
 		__NOP();
 	}
 
-	if (i2c_msg_read(NUNCHUK_DATA_LEN, buff)) {
-		prj_error	|= ERROR_NUNCHUK_I2C_READ;
-		prj_error_handle();
-		return	ERROR_NOK;
-	}
-
-#if 0
-	nunchuk_decrypt(buff);
-#endif
 	nunchuk_extract_data(buff, data);
 
 	return	ERROR_OK;
@@ -251,17 +239,6 @@ static	int	nunchuk_start		(void)
 
 	return	ERROR_OK;
 }
-
-#if 0
-static	void	nunchuk_decrypt		(uint8_t buff [NUNCHUK_DATA_LEN])
-{
-	int	i;
-
-	for (i = 0; i < NUNCHUK_DATA_LEN; i++) {
-		buff[i]	^= NUNCHUK_DATA_KEY;
-	}
-}
-#endif
 
 static	void	nunchuk_extract_data	(uint8_t buff [NUNCHUK_DATA_LEN],
 						Nunchuk_Data_s  *data)
