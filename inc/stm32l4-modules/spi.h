@@ -54,7 +54,7 @@
  ******************************************************************************/
 int	spi_init	(void);
 int	spi_deinit	(void);
-int	spi_msg_write	(uint8_t data_len, uint8_t data [data_len]);
+int	spi_msg_write	(uint8_t data_len, const uint8_t data [data_len]);
 
 
 /******************************************************************************

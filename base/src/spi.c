@@ -189,7 +189,7 @@ int	spi_deinit	(void)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	spi_msg_write	(uint8_t data_len, uint8_t data [data_len])
+int	spi_msg_write	(uint8_t data_len, const uint8_t data [data_len])
 {
 	uint8_t	buff [data_len];
 	int	i;

@@ -241,7 +241,7 @@ int	can_deinit	(void)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	can_msg_write	(uint8_t data [CAN_DATA_LEN])
+int	can_msg_write	(const uint8_t data [CAN_DATA_LEN])
 {
 	uint8_t	can_tx_data [CAN_DATA_LEN];
 	int	i;
