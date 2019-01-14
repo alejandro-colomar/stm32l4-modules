@@ -19,6 +19,7 @@
  ******************************************************************************/
 	#include <stdbool.h>
 	#include <stdint.h>
+	#include <string.h>
 
 	#include "stm32l4xx_hal.h"
 
@@ -30,6 +31,13 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
+	# define	I2C_TIMING	(0xF0330309u)
+	# define	I2C_ADDRESS	(0x00u)
+	# define	I2C_BUFF_SIZE	(UINT8_MAX)
+	# define	I2C_PRIORITY	(1)
+	# define	I2C_SUBPRIORITY	(1)
+	# define	I2C_TRIALS	(10)
+	# define	I2C_TIMEOUT	(10000)
 
 
 /******************************************************************************
@@ -180,7 +188,7 @@ int	i2c_chk_slave	(uint8_t addr)
 	 */
 int	i2c_msg_write	(uint8_t addr, uint8_t data_len, const uint8_t data [data_len])
 {
-	int	i;
+	uint8_t	buff [data_len];
 
 	if (init_pending) {
 		if (i2c_init()) {
@@ -190,12 +198,10 @@ int	i2c_msg_write	(uint8_t addr, uint8_t data_len, const uint8_t data [data_len]
 		}
 	}
 
-	for (i = 0; i < data_len; i++) {
-		i2c_buff[i]	= data[i];
-	}
+	memcpy(buff, data, data_len);
 
 	/* XXX:  << 1 is because of HAL bug */
-	if (HAL_I2C_Master_Transmit_IT(&i2c, addr << 1, i2c_buff, data_len)) {
+	if (HAL_I2C_Master_Transmit_IT(&i2c, addr << 1, buff, data_len)) {
 		prj_error	|= ERROR_I2C_TRANSMIT;
 		prj_error_handle();
 		return	ERROR_NOK;
