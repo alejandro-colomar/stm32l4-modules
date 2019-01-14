@@ -180,7 +180,7 @@ int	nunchuk_read	(Nunchuk_Data_s *data)
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
-	while (!i2c_msg_ready()) {
+	while (!i2c_ready()) {
 //		__WFI();
 		__NOP();
 	}
@@ -190,7 +190,7 @@ int	nunchuk_read	(Nunchuk_Data_s *data)
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
-	while (!i2c_msg_ready()) {
+	while (!i2c_ready()) {
 //		__WFI();
 		__NOP();
 	}
@@ -222,7 +222,7 @@ static	int	nunchuk_start		(void)
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
-	while (!i2c_msg_ready()) {
+	while (!i2c_ready()) {
 //		__WFI();
 		__NOP();
 	}
@@ -233,7 +233,7 @@ static	int	nunchuk_start		(void)
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
-	while (!i2c_msg_ready()) {
+	while (!i2c_ready()) {
 //		__WFI();
 		__NOP();
 	}
@@ -244,7 +244,7 @@ static	int	nunchuk_start		(void)
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
-	while (!i2c_msg_ready()) {
+	while (!i2c_ready()) {
 //		__WFI();
 		__NOP();
 	}

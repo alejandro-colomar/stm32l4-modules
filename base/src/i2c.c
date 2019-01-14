@@ -154,6 +154,16 @@ int	i2c_deinit	(void)
 }
 
 	/**
+	 * @brief	Check if i2c is ready
+	 * @retval	ready:	true if ready
+	 */
+bool	i2c_ready	(void)
+{
+
+	return	(HAL_I2C_STATE_READY == HAL_I2C_GetState(&i2c));
+}
+
+	/**
 	 * @brief	Check I2C slave
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
@@ -239,16 +249,6 @@ int	i2c_msg_ask	(uint8_t addr, uint8_t data_len)
 }
 
 	/**
-	 * @brief	Check if i2c is ready
-	 * @retval	ready:	true if ready
-	 */
-bool	i2c_msg_ready	(void)
-{
-
-	return	(HAL_I2C_STATE_READY == HAL_I2C_GetState(&i2c));
-}
-
-	/**
 	 * @brief	Read the data received
 	 * @param	data_len:	length of data
 	 * @param	data:		array where data is to be written
@@ -268,7 +268,7 @@ int	i2c_msg_read	(uint8_t data_len, uint8_t data [data_len])
 		}
 	}
 
-	if (!i2c_msg_ready()) {
+	if (!i2c_ready()) {
 		prj_error	|= ERROR_I2C_NOT_READY;
 		return	ERROR_NOK;
 	}
