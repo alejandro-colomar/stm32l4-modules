@@ -36,6 +36,9 @@
 # define	TIMx_CLK_DISABLE()	__HAL_RCC_TIM3_CLK_DISABLE()
 
 # define	TIMx_IRQHandler		TIM3_IRQHandler
+# define	TIMx_IRQn		(TIM3_IRQn)
+# define	TIMx_PREEMPT_PRIORITY	(2)
+# define	TIMx_SUB_PRIORITY	(2)
 
 
 /******************************************************************************
@@ -62,6 +65,8 @@ static	TIM_HandleTypeDef	tim;
 /******************************************************************************
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
+static	void	tim_nvic_conf		(void);
+static	void	tim_nvic_deconf		(void);
 static	int	tim_timx_tim_init	(uint16_t period_ms);
 static	int	tim_timx_tim_deinit	(void);
 
@@ -87,6 +92,7 @@ int	tim_timx_init		(uint16_t period_us)
 	tim_timx_interrupt	= false;
 
 	TIMx_CLK_ENABLE();
+	tim_nvic_conf();
 	if (tim_timx_tim_init(period_us)) {
 		prj_error	|= ERROR_TIM_HAL_TIM_INIT;
 		prj_error_handle();
@@ -108,6 +114,7 @@ err_start:
 	}
 
 err_init:
+	tim_nvic_deconf();
 	TIMx_CLK_DISABLE();
 	init_pending	= true;
 
@@ -141,6 +148,7 @@ int	tim_timx_deinit		(void)
 		prj_error_handle();
 		status	= ERROR_NOK;
 	}
+	tim_nvic_deconf();
 	TIMx_CLK_DISABLE();
 
 	return	status;
@@ -175,6 +183,20 @@ void	HAL_TIM_PeriodElapsedCallback	(TIM_HandleTypeDef *tim_ptr)
 /******************************************************************************
  ******* static functions (definitions) ***************************************
  ******************************************************************************/
+static	void	tim_nvic_conf		(void)
+{
+
+	HAL_NVIC_SetPriority(TIMx_IRQn, TIMx_PREEMPT_PRIORITY,
+					TIMx_SUB_PRIORITY);
+	HAL_NVIC_EnableIRQ(TIMx_IRQn);
+}
+
+static	void	tim_nvic_deconf		(void)
+{
+
+	HAL_NVIC_DisableIRQ(TIMx_IRQn);
+}
+
 static	int	tim_timx_tim_init	(uint16_t period_us)
 {
 
