@@ -32,7 +32,7 @@
  ******* macros ***************************************************************
  ******************************************************************************/
 # define	ERROR_BIT_LEN			(UINT32_C(1000000))
-# define	ERROR_LONG_PULSE_LEN_US		((uint32_t)(ERROR_BIT_LEN * 0.8))
+# define	ERROR_LONG_PULSE_LEN_US		((uint32_t)(ERROR_BIT_LEN * 0.6))
 # define	ERROR_SHORT_PULSE_LEN_US	((uint32_t)(ERROR_BIT_LEN * 0.1))
 
 
