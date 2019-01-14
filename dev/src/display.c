@@ -34,133 +34,139 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-	# define	DISPLAY_CODE_DISABLE_MAX7219	(0x0C00u)
-	# define	DISPLAY_CODE_DISABLE_TEST_MODE	(0x0F00u)
-	# define	DISPLAY_CODE_ENABLE_8_DIGITS	(0x0BFFu)
-	# define	DISPLAY_CODE_SET_MAX_BRIGHTNESS	(0x0A0Fu)
-	# define	DISPLAY_CODE_DISABLE_BCD_MODE	(0x0900u)
-	# define	DISPLAY_CODE_ENABLE_MAX7219	(0x0C01u)
+	# define	DISPLAY_CODE_DISABLE_MAX7219	\
+				((uint8_t [2]) {0xCu, 0x00u})
+	# define	DISPLAY_CODE_DISABLE_TEST_MODE	\
+				((uint8_t [2]) {0x0F, 0x00u})
+	# define	DISPLAY_CODE_ENABLE_8_DIGITS	\
+				((uint8_t [2]) {0x0B, 0xFFu})
+	# define	DISPLAY_CODE_SET_MAX_BRIGHTNESS	\
+				((uint8_t [2]) {0x0A, 0x0Fu})
+	# define	DISPLAY_CODE_DISABLE_BCD_MODE	\
+				((uint8_t [2]) {0x09, 0x00u})
+	# define	DISPLAY_CODE_ENABLE_MAX7219	\
+				((uint8_t [2]) {0x0C, 0x01u})
 
 	# define	DISPLAY_DATA_CHAR_0	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x38u | DISPLAY_ROW(0),		\
-					0x44u | DISPLAY_ROW(1),		\
-					0x44u | DISPLAY_ROW(2),		\
-					0x44u | DISPLAY_ROW(3),		\
-					0x44u | DISPLAY_ROW(4),		\
-					0x44u | DISPLAY_ROW(5),		\
-					0x44u | DISPLAY_ROW(6),		\
-					0x38u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x38u},	\
+					{DISPLAY_ROW(1), 0x44u},	\
+					{DISPLAY_ROW(2), 0x44u},	\
+					{DISPLAY_ROW(3), 0x44u},	\
+					{DISPLAY_ROW(4), 0x44u},	\
+					{DISPLAY_ROW(5), 0x44u},	\
+					{DISPLAY_ROW(6), 0x44u},	\
+					{DISPLAY_ROW(7), 0x38u}		\
 				})
 	# define	DISPLAY_DATA_CHAR_1	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x10u | DISPLAY_ROW(0),		\
-					0x30u | DISPLAY_ROW(1),		\
-					0x10u | DISPLAY_ROW(2),		\
-					0x10u | DISPLAY_ROW(3),		\
-					0x10u | DISPLAY_ROW(4),		\
-					0x10u | DISPLAY_ROW(5),		\
-					0x10u | DISPLAY_ROW(6),		\
-					0x38u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x10u},	\
+					{DISPLAY_ROW(1), 0x30u},	\
+					{DISPLAY_ROW(2), 0x10u},	\
+					{DISPLAY_ROW(3), 0x10u},	\
+					{DISPLAY_ROW(4), 0x10u},	\
+					{DISPLAY_ROW(5), 0x10u},	\
+					{DISPLAY_ROW(6), 0x10u},	\
+					{DISPLAY_ROW(7), 0x38u}		\
 				})
 	# define	DISPLAY_DATA_CHAR_2	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x38u | DISPLAY_ROW(0),		\
-					0x44u | DISPLAY_ROW(1),		\
-					0x04u | DISPLAY_ROW(2),		\
-					0x04u | DISPLAY_ROW(3),		\
-					0x08u | DISPLAY_ROW(4),		\
-					0x10u | DISPLAY_ROW(5),		\
-					0x20u | DISPLAY_ROW(6),		\
-					0x7Cu | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x38u},	\
+					{DISPLAY_ROW(1), 0x44u},	\
+					{DISPLAY_ROW(2), 0x04u},	\
+					{DISPLAY_ROW(3), 0x04u},	\
+					{DISPLAY_ROW(4), 0x08u},	\
+					{DISPLAY_ROW(5), 0x10u},	\
+					{DISPLAY_ROW(6), 0x20u},	\
+					{DISPLAY_ROW(7), 0x7Cu}		\
 				})
 	# define	DISPLAY_DATA_CHAR_3	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x38u | DISPLAY_ROW(0),		\
-					0x44u | DISPLAY_ROW(1),		\
-					0x04u | DISPLAY_ROW(2),		\
-					0x18u | DISPLAY_ROW(3),		\
-					0x04u | DISPLAY_ROW(4),		\
-					0x04u | DISPLAY_ROW(5),		\
-					0x44u | DISPLAY_ROW(6),		\
-					0x38u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x38u},	\
+					{DISPLAY_ROW(1), 0x44u},	\
+					{DISPLAY_ROW(2), 0x04u},	\
+					{DISPLAY_ROW(3), 0x18u},	\
+					{DISPLAY_ROW(4), 0x04u},	\
+					{DISPLAY_ROW(5), 0x04u},	\
+					{DISPLAY_ROW(6), 0x44u},	\
+					{DISPLAY_ROW(7), 0x38u}		\
 				})
 	# define	DISPLAY_DATA_CHAR_4	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x04u | DISPLAY_ROW(0),		\
-					0x0Cu | DISPLAY_ROW(1),		\
-					0x14u | DISPLAY_ROW(2),		\
-					0x24u | DISPLAY_ROW(3),		\
-					0x44u | DISPLAY_ROW(4),		\
-					0x7Cu | DISPLAY_ROW(5),		\
-					0x04u | DISPLAY_ROW(6),		\
-					0x04u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x04u},	\
+					{DISPLAY_ROW(1), 0x0Cu},	\
+					{DISPLAY_ROW(2), 0x14u},	\
+					{DISPLAY_ROW(3), 0x24u},	\
+					{DISPLAY_ROW(4), 0x44u},	\
+					{DISPLAY_ROW(5), 0x7Cu},	\
+					{DISPLAY_ROW(6), 0x04u},	\
+					{DISPLAY_ROW(7), 0x04u}		\
 				})
 	# define	DISPLAY_DATA_CHAR_5	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x7Cu | DISPLAY_ROW(0),		\
-					0x40u | DISPLAY_ROW(1),		\
-					0x40u | DISPLAY_ROW(2),		\
-					0x78u | DISPLAY_ROW(3),		\
-					0x04u | DISPLAY_ROW(4),		\
-					0x04u | DISPLAY_ROW(5),		\
-					0x44u | DISPLAY_ROW(6),		\
-					0x38u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x7Cu},	\
+					{DISPLAY_ROW(1), 0x40u},	\
+					{DISPLAY_ROW(2), 0x40u},	\
+					{DISPLAY_ROW(3), 0x78u},	\
+					{DISPLAY_ROW(4), 0x04u},	\
+					{DISPLAY_ROW(5), 0x04u},	\
+					{DISPLAY_ROW(6), 0x44u},	\
+					{DISPLAY_ROW(7), 0x38u}		\
 				})
 	# define	DISPLAY_DATA_CHAR_6	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x38u | DISPLAY_ROW(0),		\
-					0x44u | DISPLAY_ROW(1),		\
-					0x40u | DISPLAY_ROW(2),		\
-					0x78u | DISPLAY_ROW(3),		\
-					0x44u | DISPLAY_ROW(4),		\
-					0x44u | DISPLAY_ROW(5),		\
-					0x44u | DISPLAY_ROW(6),		\
-					0x38u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x38u},	\
+					{DISPLAY_ROW(1), 0x44u},	\
+					{DISPLAY_ROW(2), 0x40u},	\
+					{DISPLAY_ROW(3), 0x78u},	\
+					{DISPLAY_ROW(4), 0x44u},	\
+					{DISPLAY_ROW(5), 0x44u},	\
+					{DISPLAY_ROW(6), 0x44u},	\
+					{DISPLAY_ROW(7), 0x38u}		\
 				})
 	# define	DISPLAY_DATA_CHAR_7	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x7Cu | DISPLAY_ROW(0),		\
-					0x04u | DISPLAY_ROW(1),		\
-					0x04u | DISPLAY_ROW(2),		\
-					0x08u | DISPLAY_ROW(3),		\
-					0x10u | DISPLAY_ROW(4),		\
-					0x20u | DISPLAY_ROW(5),		\
-					0x20u | DISPLAY_ROW(6),		\
-					0x20u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x7Cu},	\
+					{DISPLAY_ROW(1), 0x04u},	\
+					{DISPLAY_ROW(2), 0x04u},	\
+					{DISPLAY_ROW(3), 0x08u},	\
+					{DISPLAY_ROW(4), 0x10u},	\
+					{DISPLAY_ROW(5), 0x20u},	\
+					{DISPLAY_ROW(6), 0x20u},	\
+					{DISPLAY_ROW(7), 0x20u}		\
 				})
 	# define	DISPLAY_DATA_CHAR_8	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x38u | DISPLAY_ROW(0),		\
-					0x44u | DISPLAY_ROW(1),		\
-					0x44u | DISPLAY_ROW(2),		\
-					0x38u | DISPLAY_ROW(3),		\
-					0x44u | DISPLAY_ROW(4),		\
-					0x44u | DISPLAY_ROW(5),		\
-					0x44u | DISPLAY_ROW(6),		\
-					0x38u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x38u},	\
+					{DISPLAY_ROW(1), 0x44u},	\
+					{DISPLAY_ROW(2), 0x44u},	\
+					{DISPLAY_ROW(3), 0x38u},	\
+					{DISPLAY_ROW(4), 0x44u},	\
+					{DISPLAY_ROW(5), 0x44u},	\
+					{DISPLAY_ROW(6), 0x44u},	\
+					{DISPLAY_ROW(7), 0x38u}		\
 				})
 	# define	DISPLAY_DATA_CHAR_9	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x38u | DISPLAY_ROW(0),		\
-					0x44u | DISPLAY_ROW(1),		\
-					0x44u | DISPLAY_ROW(2),		\
-					0x44u | DISPLAY_ROW(3),		\
-					0x3Cu | DISPLAY_ROW(4),		\
-					0x04u | DISPLAY_ROW(5),		\
-					0x44u | DISPLAY_ROW(6),		\
-					0x38u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x38u},	\
+					{DISPLAY_ROW(1), 0x44u},	\
+					{DISPLAY_ROW(2), 0x44u},	\
+					{DISPLAY_ROW(3), 0x44u},	\
+					{DISPLAY_ROW(4), 0x3Cu},	\
+					{DISPLAY_ROW(5), 0x04u},	\
+					{DISPLAY_ROW(6), 0x44u},	\
+					{DISPLAY_ROW(7), 0x38u}		\
 				})
 	# define	DISPLAY_DATA_CHAR_BLANK	\
-				((uint16_t [DISPLAY_ROWS]) {		\
-					0x00u | DISPLAY_ROW(0),		\
-					0x00u | DISPLAY_ROW(1),		\
-					0x00u | DISPLAY_ROW(2),		\
-					0x00u | DISPLAY_ROW(3),		\
-					0x00u | DISPLAY_ROW(4),		\
-					0x00u | DISPLAY_ROW(5),		\
-					0x00u | DISPLAY_ROW(6),		\
-					0x00u | DISPLAY_ROW(7),		\
+				((uint8_t [DISPLAY_ROWS] [2]) {		\
+					{DISPLAY_ROW(0), 0x00u},	\
+					{DISPLAY_ROW(1), 0x00u},	\
+					{DISPLAY_ROW(2), 0x00u},	\
+					{DISPLAY_ROW(3), 0x00u},	\
+					{DISPLAY_ROW(4), 0x00u},	\
+					{DISPLAY_ROW(5), 0x00u},	\
+					{DISPLAY_ROW(6), 0x00u},	\
+					{DISPLAY_ROW(7), 0x00u}		\
 				})
 
 
@@ -187,7 +193,7 @@ static	bool	init_pending	= true;
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
 static	int	display_start		(void);
-static	int	display_data_set	(char ch, uint16_t data [DISPLAY_ROWS]);
+static	int	display_data_set	(char c, uint8_t data [DISPLAY_ROWS] [2]);
 
 
 /******************************************************************************
@@ -227,6 +233,7 @@ err_display:
 		prj_error_handle();
 	}
 err_init:
+	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -263,7 +270,7 @@ int	display_deinit	(void)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	display_set	(uint16_t data [DISPLAY_ROWS])
+int	display_set	(uint8_t data [DISPLAY_ROWS] [2])
 {
 	int		i;
 
@@ -276,7 +283,7 @@ int	display_set	(uint16_t data [DISPLAY_ROWS])
 	}
 
 	for (i = 0; i < DISPLAY_ROWS; i++) {
-		if (spi_msg_write(data[i])) {
+		if (spi_msg_write(2, data[i])) {
 			prj_error	|= ERROR_DISPLAY_SPI_MSG_WRITE;
 			prj_error_handle();
 			return	ERROR_NOK;
@@ -292,9 +299,9 @@ int	display_set	(uint16_t data [DISPLAY_ROWS])
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	display_set_ch	(char ch)
+int	display_set_ch	(char c)
 {
-	uint16_t	data [DISPLAY_ROWS];
+	uint8_t	data [DISPLAY_ROWS] [2];
 
 	if (init_pending) {
 		if (display_init()) {
@@ -304,7 +311,7 @@ int	display_set_ch	(char ch)
 		}
 	}
 
-	if (display_data_set(ch, data)) {
+	if (display_data_set(c, data)) {
 		prj_error	|= ERROR_DISPLAY_CHAR;
 		prj_error_handle();
 		return	ERROR_NOK;
@@ -322,37 +329,37 @@ int	display_set_ch	(char ch)
 static	int	display_start		(void)
 {
 
-	if (spi_msg_write(DISPLAY_CODE_DISABLE_MAX7219)) {
+	if (spi_msg_write(2, DISPLAY_CODE_DISABLE_MAX7219)) {
 		return	ERROR_NOK;
 	}
 
-	if (spi_msg_write(DISPLAY_CODE_DISABLE_TEST_MODE)) {
+	if (spi_msg_write(2, DISPLAY_CODE_DISABLE_TEST_MODE)) {
 		return	ERROR_NOK;
 	}
 
-	if (spi_msg_write(DISPLAY_CODE_ENABLE_8_DIGITS)) {
+	if (spi_msg_write(2, DISPLAY_CODE_ENABLE_8_DIGITS)) {
 		return	ERROR_NOK;
 	}
 
-	if (spi_msg_write(DISPLAY_CODE_SET_MAX_BRIGHTNESS)) {
+	if (spi_msg_write(2, DISPLAY_CODE_SET_MAX_BRIGHTNESS)) {
 		return	ERROR_NOK;
 	}
 
-	if (spi_msg_write(DISPLAY_CODE_DISABLE_BCD_MODE)) {
+	if (spi_msg_write(2, DISPLAY_CODE_DISABLE_BCD_MODE)) {
 		return	ERROR_NOK;
 	}
 
-	if (spi_msg_write(DISPLAY_CODE_ENABLE_MAX7219)) {
+	if (spi_msg_write(2, DISPLAY_CODE_ENABLE_MAX7219)) {
 		return	ERROR_NOK;
 	}
 
 	return	ERROR_OK;
 }
 
-static	int	display_data_set	(char ch, uint16_t data [DISPLAY_ROWS])
+static	int	display_data_set	(char c, uint8_t data [DISPLAY_ROWS] [2])
 {
 
-	switch (ch) {
+	switch (c) {
 	case '0':
 		memcpy(data, DISPLAY_DATA_CHAR_0, sizeof(DISPLAY_DATA_CHAR_0));
 		break;

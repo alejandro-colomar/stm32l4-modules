@@ -32,6 +32,59 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
+# define	CANx_INSTANCE				(CAN1)
+# define	CANx_CLK_ENABLE()			__HAL_RCC_CAN1_CLK_ENABLE()
+# define	CANx_CLK_DISABLE()			__HAL_RCC_CAN1_CLK_DISABLE()
+
+# define	CANx_TX_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOA_CLK_ENABLE()
+# define	CANx_TX_GPIO_PORT			(GPIOA)
+# define	CANx_TX_GPIO_PIN			(GPIO_PIN_12)
+# define	CANx_TX_GPIO_MODE			(GPIO_MODE_AF_OD)
+# define	CANx_TX_GPIO_SPEED			(GPIO_SPEED_FREQ_LOW)
+# define	CANx_TX_GPIO_PULL			(GPIO_NOPULL)
+# define	CANx_TX_GPIO_ALT			(GPIO_AF9_CAN1)
+
+# define	CANx_RX_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOA_CLK_ENABLE()
+# define	CANx_RX_GPIO_PORT			(GPIOA)
+# define	CANx_RX_GPIO_PIN			(GPIO_PIN_11)
+# define	CANx_RX_GPIO_MODE			(GPIO_MODE_AF_OD)
+# define	CANx_RX_GPIO_SPEED			(GPIO_SPEED_FREQ_LOW)
+# define	CANx_RX_GPIO_PULL			(GPIO_NOPULL)
+# define	CANx_RX_GPIO_ALT			(GPIO_AF9_CAN1)
+
+# define	CANx_RX0_IRQHandler			CAN1_RX0_IRQHandler
+# define	CANx_RX0_IRQn				(CAN1_RX0_IRQn)
+# define	CANx_PREEMPT_PRIORITY			(1)
+# define	CANx_SUB_PRIORITY			(0)
+
+# define	CANx_INIT_TIME_TRIGGERED_MODE		(DISABLE)
+# define	CANx_INIT_AUTO_BUS_OFF			(DISABLE)
+# define	CANx_INIT_AUTO_WAKE_UP			(DISABLE)
+# define	CANx_INIT_AUTO_RETRANSMISSION		(ENABLE)
+# define	CANx_INIT_RECEIVE_FIFO_LOCKED		(DISABLE)
+# define	CANx_INIT_TRANSMIT_FIFO_PRIORITY	(DISABLE)
+# define	CANx_INIT_MODE				(CAN_MODE_NORMAL)
+# define	CANx_INIT_SYNC_JUMP_WIDTH		(CAN_SJW_1TQ)
+# define	CANx_INIT_TIME_SEG_1			(CAN_BS1_4TQ)
+# define	CANx_INIT_TIME_SEG_2			(CAN_BS2_5TQ)
+# define	CANx_INIT_PRESCALER			(SystemCoreClock / 1000000u)
+
+# define	CANx_FILTER_ID_HI			(0)
+# define	CANx_FILTER_ID_LO			(0)
+# define	CANx_FILTER_MASK_ID_HI			(0)
+# define	CANx_FILTER_MASK_ID_LO			(0)
+# define	CANx_FILTER_FIFO_ASSIGNMENT		(CAN_FILTER_FIFO0)
+# define	CANx_FILTER_BANK			(5)
+# define	CANx_FILTER_MODE			(CAN_FILTERMODE_IDMASK)
+# define	CANx_FILTER_SCALE			(CAN_FILTERSCALE_16BIT)
+# define	CANx_FILTER_ACTIVATION			(ENABLE)
+
+# define	CANx_TX_HDR_STD_ID			(0x3AAu)
+# define	CANx_TX_HDR_EXT_ID			(0)
+# define	CANx_TX_HDR_IDE				(CAN_ID_STD)
+# define	CANx_TX_HDR_RTR				(CAN_RTR_DATA)
+# define	CANx_TX_HDR_DLC				(CAN_DATA_LEN)
+# define	CANx_TX_HDR_TRANSMISSION_GLOBAL_TIME	(DISABLE)
 
 
 /******************************************************************************
@@ -138,6 +191,7 @@ err_filter:
 
 err_peripherial:
 	can_msp_deinit();
+	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -257,9 +311,9 @@ int	can_msg_read	(uint8_t data [CAN_DATA_LEN])
  ******* HAL weak functions (redefinitions) ***********************************
  ******************************************************************************/
 	/**
-	 * @brief	This function handles CAN1 RX0 interrupt request
+	 * @brief	This function handles CANx RX0 interrupt request
 	 */
-void	CAN1_RX0_IRQHandler			(void)
+void	CANx_RX0_IRQHandler			(void)
 {
 
 	HAL_CAN_IRQHandler(&can);
@@ -292,7 +346,7 @@ void	HAL_CAN_RxFifo0MsgPendingCallback	(CAN_HandleTypeDef *can_ptr)
 static	void	can_msp_init		(void)
 {
 
-	__HAL_RCC_CAN1_CLK_ENABLE();
+	CANx_CLK_ENABLE();
 	can_gpio_init();
 	can_nvic_conf();
 }
@@ -302,7 +356,7 @@ static	void	can_msp_deinit		(void)
 
 	can_nvic_deconf();
 	can_gpio_deinit();
-	__HAL_RCC_CAN1_CLK_DISABLE();
+	CANx_CLK_DISABLE();
 }
 
 	/*
@@ -313,14 +367,21 @@ static	void	can_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
-	__HAL_RCC_GPIOA_CLK_ENABLE();
+	CANx_TX_GPIO_CLK_ENABLE();
+	gpio.Pin	= CANx_TX_GPIO_PIN;
+	gpio.Mode	= CANx_TX_GPIO_MODE;
+	gpio.Speed	= CANx_TX_GPIO_SPEED;
+	gpio.Pull	= CANx_TX_GPIO_PULL;
+	gpio.Alternate	= CANx_TX_GPIO_ALT;
+	HAL_GPIO_Init(CANx_TX_GPIO_PORT, &gpio);
 
-	gpio.Pin	= GPIO_PIN_12 | GPIO_PIN_11;
-	gpio.Mode	= GPIO_MODE_AF_OD;
-	gpio.Speed	= GPIO_SPEED_FREQ_LOW;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Alternate	= GPIO_AF9_CAN1;
-	HAL_GPIO_Init(GPIOA, &gpio);
+	CANx_RX_GPIO_CLK_ENABLE();
+	gpio.Pin	= CANx_RX_GPIO_PIN;
+	gpio.Mode	= CANx_RX_GPIO_MODE;
+	gpio.Speed	= CANx_RX_GPIO_SPEED;
+	gpio.Pull	= CANx_RX_GPIO_PULL;
+	gpio.Alternate	= CANx_RX_GPIO_ALT;
+	HAL_GPIO_Init(CANx_RX_GPIO_PORT, &gpio);
 }
 
 	/*
@@ -330,20 +391,22 @@ static	void	can_gpio_init		(void)
 static	void	can_gpio_deinit		(void)
 {
 
-	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_12 | GPIO_PIN_11);
+	HAL_GPIO_DeInit(CANx_TX_GPIO_PORT, CANx_TX_GPIO_PIN);
+	HAL_GPIO_DeInit(CANx_RX_GPIO_PORT, CANx_RX_GPIO_PIN);
 }
 
 static	void	can_nvic_conf		(void)
 {
 
-	HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 1, 0);
-	HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
+	HAL_NVIC_SetPriority(CANx_RX0_IRQn, CANx_PREEMPT_PRIORITY,
+						CANx_SUB_PRIORITY);
+	HAL_NVIC_EnableIRQ(CANx_RX0_IRQn);
 }
 
 static	void	can_nvic_deconf		(void)
 {
 
-	HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
+	HAL_NVIC_DisableIRQ(CANx_RX0_IRQn);
 }
 
 	/*
@@ -353,18 +416,18 @@ static	void	can_nvic_deconf		(void)
 static	int	can_peripherial_init	(void)
 {
 
-	can.Instance		= CAN1;
-	can.Init.TimeTriggeredMode	= DISABLE;
-	can.Init.AutoBusOff		= DISABLE;
-	can.Init.AutoWakeUp		= DISABLE;
-	can.Init.AutoRetransmission	= ENABLE;
-	can.Init.ReceiveFifoLocked	= DISABLE;
-	can.Init.TransmitFifoPriority	= DISABLE;
-	can.Init.Mode			= CAN_MODE_NORMAL;
-	can.Init.SyncJumpWidth		= CAN_SJW_1TQ;
-	can.Init.TimeSeg1		= CAN_BS1_4TQ;
-	can.Init.TimeSeg2		= CAN_BS2_5TQ;
-	can.Init.Prescaler		= SystemCoreClock / 1000000u;
+	can.Instance		= CANx_INSTANCE;
+	can.Init.TimeTriggeredMode	= CANx_INIT_TIME_TRIGGERED_MODE;
+	can.Init.AutoBusOff		= CANx_INIT_AUTO_BUS_OFF;
+	can.Init.AutoWakeUp		= CANx_INIT_AUTO_WAKE_UP;
+	can.Init.AutoRetransmission	= CANx_INIT_AUTO_RETRANSMISSION;
+	can.Init.ReceiveFifoLocked	= CANx_INIT_RECEIVE_FIFO_LOCKED;
+	can.Init.TransmitFifoPriority	= CANx_INIT_TRANSMIT_FIFO_PRIORITY;
+	can.Init.Mode			= CANx_INIT_MODE;
+	can.Init.SyncJumpWidth		= CANx_INIT_SYNC_JUMP_WIDTH;
+	can.Init.TimeSeg1		= CANx_INIT_TIME_SEG_1;
+	can.Init.TimeSeg2		= CANx_INIT_TIME_SEG_2;
+	can.Init.Prescaler		= CANx_INIT_PRESCALER;
 
 	return	HAL_CAN_Init(&can);
 }
@@ -379,15 +442,15 @@ static	int	can_filter_conf		(void)
 {
 	CAN_FilterTypeDef	can_filter;
 
-	can_filter.FilterIdHigh		= 0x0000u;
-	can_filter.FilterIdLow		= 0x0000u;
-	can_filter.FilterMaskIdHigh	= 0x0000u;
-	can_filter.FilterMaskIdLow	= 0x0000u;
-	can_filter.FilterFIFOAssignment	= CAN_FILTER_FIFO0;
-	can_filter.FilterBank		= 5;
-	can_filter.FilterMode		= CAN_FILTERMODE_IDMASK;
-	can_filter.FilterScale		= CAN_FILTERSCALE_16BIT;
-	can_filter.FilterActivation	= ENABLE;
+	can_filter.FilterIdHigh		= CANx_FILTER_ID_HI;
+	can_filter.FilterIdLow		= CANx_FILTER_ID_LO;
+	can_filter.FilterMaskIdHigh	= CANx_FILTER_MASK_ID_HI;
+	can_filter.FilterMaskIdLow	= CANx_FILTER_MASK_ID_LO;
+	can_filter.FilterFIFOAssignment	= CANx_FILTER_FIFO_ASSIGNMENT;
+	can_filter.FilterBank		= CANx_FILTER_BANK;
+	can_filter.FilterMode		= CANx_FILTER_MODE;
+	can_filter.FilterScale		= CANx_FILTER_SCALE;
+	can_filter.FilterActivation	= CANx_FILTER_ACTIVATION;
 
 	return	HAL_CAN_ConfigFilter(&can, &can_filter);
 }
@@ -395,12 +458,12 @@ static	int	can_filter_conf		(void)
 static	void	can_tx_header_conf	(void)
 {
 
-	can_tx_header.StdId			= 0x3AAu;
-	can_tx_header.ExtId			= 0x00u;
-	can_tx_header.IDE			= CAN_ID_STD;
-	can_tx_header.RTR			= CAN_RTR_DATA;
-	can_tx_header.DLC			= CAN_DATA_LEN;
-	can_tx_header.TransmitGlobalTime	= DISABLE;
+	can_tx_header.StdId		= CANx_TX_HDR_STD_ID;
+	can_tx_header.ExtId		= CANx_TX_HDR_EXT_ID;
+	can_tx_header.IDE		= CANx_TX_HDR_IDE;
+	can_tx_header.RTR		= CANx_TX_HDR_RTR;
+	can_tx_header.DLC		= CANx_TX_HDR_DLC;
+	can_tx_header.TransmitGlobalTime = CANx_TX_HDR_TRANSMISSION_GLOBAL_TIME;
 }
 
 

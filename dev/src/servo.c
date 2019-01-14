@@ -91,7 +91,7 @@ int	servo_init		(void)
 		return	ERROR_OK;
 	}
 
-	if (pwm_tim2_init(SERVO_PWM_RESOLUTION_s, SERVO_PWM_PERIOD_us)) {
+	if (pwm_timx_init(SERVO_PWM_RESOLUTION_s, SERVO_PWM_PERIOD_us)) {
 		prj_error	|= ERROR_SERVO_PWM_INIT;
 		prj_error_handle();
 		goto err_init;
@@ -119,10 +119,11 @@ err_ch_set:
 	servo_stop(SERVO_S2);
 	servo_stop(SERVO_S1);
 err_init:
-	if (pwm_tim2_deinit()) {
+	if (pwm_timx_deinit()) {
 		prj_error	|= ERROR_SERVO_PWM_DEINIT;
 		prj_error_handle();
 	}
+	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -156,7 +157,7 @@ int	servo_deinit		(void)
 	if (servo_stop(SERVO_S1)) {
 		status	= ERROR_NOK;
 	}
-	if (pwm_tim2_deinit()) {
+	if (pwm_timx_deinit()) {
 		prj_error	|= ERROR_SERVO_PWM_DEINIT;
 		prj_error_handle();
 		status	= ERROR_NOK;
@@ -204,7 +205,7 @@ int	servo_position_set	(int8_t servo, float position)
 	}
 
 	servo_duty_calc(position, &duty_cycle[servo]);
-	if (pwm_tim2_chX_set(tim_chan, duty_cycle[servo])) {
+	if (pwm_timx_chX_set(tim_chan, duty_cycle[servo])) {
 		prj_error	|= ERROR_SERVO_PWM_SET;
 		prj_error_handle();
 		return	ERROR_NOK;
@@ -250,7 +251,7 @@ int	servo_stop		(int8_t servo)
 		return	ERROR_NOK;
 	}
 
-	if (pwm_tim2_chX_stop(tim_chan)) {
+	if (pwm_timx_chX_stop(tim_chan)) {
 		prj_error	|= ERROR_SERVO_PWM_STOP;
 		prj_error_handle();
 		return	ERROR_NOK;

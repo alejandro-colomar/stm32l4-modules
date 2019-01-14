@@ -32,13 +32,44 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-	# define	PWM_OPEN_DRAIN	(false)
+# define	TIMx_INSTANCE			(TIM2)
+# define	TIMx_CLK_ENABLE()		__HAL_RCC_TIM2_CLK_ENABLE()
+# define	TIMx_CLK_DISABLE()		__HAL_RCC_TIM2_CLK_DISABLE()
 
-#if	PWM_OPEN_DRAIN
-	# define	PWM_OUTPUT_MODE	(GPIO_MODE_AF_OD)
-#else
-	# define	PWM_OUTPUT_MODE	(GPIO_MODE_AF_PP)
-#endif
+# define	TIMx_GPIO_MODE			(GPIO_MODE_AF_OD)
+/*# define	TIMx_GPIO_MODE			(GPIO_MODE_AF_PP)*/
+
+# define	TIMx_CH1_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
+# define	TIMx_CH1_GPIO_PORT		(GPIOA)
+# define	TIMx_CH1_GPIO_PIN		(GPIO_PIN_15)
+# define	TIMx_CH1_GPIO_MODE		(TIMx_GPIO_MODE)
+# define	TIMx_CH1_GPIO_PULL		(GPIO_NOPULL)
+# define	TIMx_CH1_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+# define	TIMx_CH1_GPIO_ALT		(GPIO_AF1_TIM2)
+
+# define	TIMx_CH2_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
+# define	TIMx_CH2_GPIO_PORT		(GPIOA)
+# define	TIMx_CH2_GPIO_PIN		(GPIO_PIN_1)
+# define	TIMx_CH2_GPIO_MODE		(TIMx_GPIO_MODE)
+# define	TIMx_CH2_GPIO_PULL		(GPIO_NOPULL)
+# define	TIMx_CH2_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+# define	TIMx_CH2_GPIO_ALT		(GPIO_AF1_TIM2)
+
+# define	TIMx_CH3_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOB_CLK_ENABLE()
+# define	TIMx_CH3_GPIO_PORT		(GPIOB)
+# define	TIMx_CH3_GPIO_PIN		(GPIO_PIN_10)
+# define	TIMx_CH3_GPIO_MODE		(TIMx_GPIO_MODE)
+# define	TIMx_CH3_GPIO_PULL		(GPIO_NOPULL)
+# define	TIMx_CH3_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+# define	TIMx_CH3_GPIO_ALT		(GPIO_AF1_TIM2)
+
+# define	TIMx_CH4_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOB_CLK_ENABLE()
+# define	TIMx_CH4_GPIO_PORT		(GPIOB)
+# define	TIMx_CH4_GPIO_PIN		(GPIO_PIN_11)
+# define	TIMx_CH4_GPIO_MODE		(TIMx_GPIO_MODE)
+# define	TIMx_CH4_GPIO_PULL		(GPIO_NOPULL)
+# define	TIMx_CH4_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+# define	TIMx_CH4_GPIO_ALT		(GPIO_AF1_TIM2)
 
 
 /******************************************************************************
@@ -65,33 +96,33 @@ static	TIM_OC_InitTypeDef	oc_init;
 /******************************************************************************
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
-static	int	pwm_tim2_clk_conf		(void);
-static	int	pwm_tim2_tim_init		(uint32_t resolution_sec,
+static	int	pwm_timx_clk_conf		(void);
+static	int	pwm_timx_tim_init		(uint32_t resolution_sec,
 								uint32_t period);
-static	int	pwm_tim2_tim_deinit		(void);
-static	int	pwm_tim2_master_conf		(void);
-static	void	pwm_tim2_oc_conf		(void);
-static	void	pwm_tim2_ch1_gpio_init		(void);
-static	void	pwm_tim2_ch1_gpio_deinit	(void);
-static	void	pwm_tim2_ch2_gpio_init		(void);
-static	void	pwm_tim2_ch2_gpio_deinit	(void);
-static	void	pwm_tim2_ch3_gpio_init		(void);
-static	void	pwm_tim2_ch3_gpio_deinit	(void);
-static	void	pwm_tim2_ch4_gpio_init		(void);
-static	void	pwm_tim2_ch4_gpio_deinit	(void);
+static	int	pwm_timx_tim_deinit		(void);
+static	int	pwm_timx_master_conf		(void);
+static	void	pwm_timx_oc_conf		(void);
+static	void	pwm_timx_ch1_gpio_init		(void);
+static	void	pwm_timx_ch1_gpio_deinit	(void);
+static	void	pwm_timx_ch2_gpio_init		(void);
+static	void	pwm_timx_ch2_gpio_deinit	(void);
+static	void	pwm_timx_ch3_gpio_init		(void);
+static	void	pwm_timx_ch3_gpio_deinit	(void);
+static	void	pwm_timx_ch4_gpio_init		(void);
+static	void	pwm_timx_ch4_gpio_deinit	(void);
 
 
 /******************************************************************************
  ******* global functions *****************************************************
  ******************************************************************************/
 	/**
-	 * @brief	Initialize PWM using TIM2
+	 * @brief	Initialize PWM using TIMx
 	 * @param	resolution_sec:	divisions in 1 s
 	 * @param	period:		period of the pwm (in resolution_sec units)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	pwm_tim2_init		(uint32_t resolution_sec, uint32_t period)
+int	pwm_timx_init		(uint32_t resolution_sec, uint32_t period)
 {
 
 	if (init_pending) {
@@ -100,51 +131,52 @@ int	pwm_tim2_init		(uint32_t resolution_sec, uint32_t period)
 		return	ERROR_OK;
 	}
 
-	__HAL_RCC_TIM2_CLK_ENABLE();
-	if (pwm_tim2_clk_conf()) {
+	TIMx_CLK_ENABLE();
+	if (pwm_timx_clk_conf()) {
 		prj_error	|= ERROR_PWM_HAL_TIM_CLK_CONF;
 		prj_error_handle();
 		goto err_clk_conf;
 	}
-	if (pwm_tim2_tim_init(resolution_sec, period)) {
+	if (pwm_timx_tim_init(resolution_sec, period)) {
 		prj_error	|= ERROR_PWM_HAL_TIM_PWM_INIT;
 		prj_error_handle();
 		goto err_init;
 	}
-	if (pwm_tim2_master_conf()) {
+	if (pwm_timx_master_conf()) {
 		prj_error	|= ERROR_PWM_HAL_TIM_MASTER_CONF;
 		prj_error_handle();
 		goto err_master_conf;
 	}
-	pwm_tim2_oc_conf();
+	pwm_timx_oc_conf();
 
-	pwm_tim2_ch1_gpio_init();
-	pwm_tim2_ch2_gpio_init();
-	pwm_tim2_ch3_gpio_init();
-	pwm_tim2_ch4_gpio_init();
+	pwm_timx_ch1_gpio_init();
+	pwm_timx_ch2_gpio_init();
+	pwm_timx_ch3_gpio_init();
+	pwm_timx_ch4_gpio_init();
 
 	return	ERROR_OK;
 
 
 err_master_conf:
-	if (pwm_tim2_tim_deinit()) {
+	if (pwm_timx_tim_deinit()) {
 		prj_error	|= ERROR_PWM_HAL_TIM_PWM_DEINIT;
 		prj_error_handle();
 	}
 
 err_init:
 err_clk_conf:
-	__HAL_RCC_TIM2_CLK_DISABLE();
+	TIMx_CLK_DISABLE();
+	init_pending	= true;
 
 	return	ERROR_NOK;
 }
 
 	/**
-	 * @brief	Deinitialize PWM using TIM2
+	 * @brief	Deinitialize PWM using TIMx
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	pwm_tim2_deinit		(void)
+int	pwm_timx_deinit		(void)
 {
 	int	status;
 
@@ -156,29 +188,29 @@ int	pwm_tim2_deinit		(void)
 		return	status;
 	}
 
-	pwm_tim2_ch4_gpio_deinit();
-	pwm_tim2_ch3_gpio_deinit();
-	pwm_tim2_ch2_gpio_deinit();
-	pwm_tim2_ch1_gpio_deinit();
+	pwm_timx_ch4_gpio_deinit();
+	pwm_timx_ch3_gpio_deinit();
+	pwm_timx_ch2_gpio_deinit();
+	pwm_timx_ch1_gpio_deinit();
 
-	if (pwm_tim2_tim_deinit()) {
+	if (pwm_timx_tim_deinit()) {
 		prj_error	|= ERROR_PWM_HAL_TIM_PWM_DEINIT;
 		prj_error_handle();
 		status	= ERROR_NOK;
 	}
-	__HAL_RCC_TIM2_CLK_DISABLE();
+	TIMx_CLK_DISABLE();
 
 	return	status;
 }
 
 	/**
-	 * @brief	Set PWM using TIM2
+	 * @brief	Set PWM using TIMx
 	 * @param	duty_cycle:	duty cycle value (fraction)
 	 * @param	tim_chan:	channel to be used (1 through 4)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	pwm_tim2_chX_set	(uint32_t tim_chan, float duty_cycle)
+int	pwm_timx_chX_set	(uint32_t tim_chan, float duty_cycle)
 {
 
 	if (init_pending) {
@@ -218,7 +250,7 @@ int	pwm_tim2_chX_set	(uint32_t tim_chan, float duty_cycle)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	pwm_tim2_chX_stop	(uint32_t tim_chan)
+int	pwm_timx_chX_stop	(uint32_t tim_chan)
 {
 
 	if (init_pending) {
@@ -240,7 +272,7 @@ int	pwm_tim2_chX_stop	(uint32_t tim_chan)
 /******************************************************************************
  ******* static functions (definitions) ***************************************
  ******************************************************************************/
-static	int	pwm_tim2_clk_conf		(void)
+static	int	pwm_timx_clk_conf		(void)
 {
 	TIM_ClockConfigTypeDef	clk;
 
@@ -252,11 +284,11 @@ static	int	pwm_tim2_clk_conf		(void)
 	return	HAL_TIM_ConfigClockSource(&tim, &clk);
 }
 
-static	int	pwm_tim2_tim_init		(uint32_t resolution_sec,
+static	int	pwm_timx_tim_init		(uint32_t resolution_sec,
 								uint32_t period)
 {
 
-	tim.Instance		= TIM2;
+	tim.Instance		= TIMx_INSTANCE;
 	tim.Init.Prescaler		= (SystemCoreClock / resolution_sec)
 									- 1u;
 	tim.Init.CounterMode		= TIM_COUNTERMODE_UP;
@@ -268,14 +300,14 @@ static	int	pwm_tim2_tim_init		(uint32_t resolution_sec,
 	return	HAL_TIM_PWM_Init(&tim);
 }
 
-static	int	pwm_tim2_tim_deinit		(void)
+static	int	pwm_timx_tim_deinit		(void)
 {
 
 	return	HAL_TIM_PWM_DeInit(&tim);
 }
 
 	/* FIXME:  Is it needed? */
-static	int	pwm_tim2_master_conf		(void)
+static	int	pwm_timx_master_conf		(void)
 {
 	TIM_MasterConfigTypeDef	master;
 
@@ -286,7 +318,7 @@ static	int	pwm_tim2_master_conf		(void)
 	return	HAL_TIMEx_MasterConfigSynchronization(&tim, &master);
 }
 
-static	void	pwm_tim2_oc_conf		(void)
+static	void	pwm_timx_oc_conf		(void)
 {
 
 	oc_init.OCMode		= TIM_OCMODE_PWM1;
@@ -298,84 +330,80 @@ static	void	pwm_tim2_oc_conf		(void)
 	oc_init.OCIdleState	= TIM_OCIDLESTATE_RESET;
 }
 
-static	void	pwm_tim2_ch1_gpio_init		(void)
+static	void	pwm_timx_ch1_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	gpio.Pin	= GPIO_PIN_15;
-	gpio.Mode	= PWM_OUTPUT_MODE;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Speed	= GPIO_SPEED_FREQ_LOW;
-	gpio.Alternate	= GPIO_AF1_TIM2;
-	HAL_GPIO_Init(GPIOA, &gpio);
+	TIMx_CH1_GPIO_CLK_ENABLE();
+	gpio.Pin	= TIMx_CH1_GPIO_PIN;
+	gpio.Mode	= TIMx_CH1_GPIO_MODE;
+	gpio.Pull	= TIMx_CH1_GPIO_PULL;
+	gpio.Speed	= TIMx_CH1_GPIO_SPEED;
+	gpio.Alternate	= TIMx_CH1_GPIO_ALT;
+	HAL_GPIO_Init(TIMx_CH1_GPIO_PORT, &gpio);
 }
 
-static	void	pwm_tim2_ch1_gpio_deinit	(void)
+static	void	pwm_timx_ch1_gpio_deinit	(void)
 {
 
-	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_15);
+	HAL_GPIO_DeInit(TIMx_CH1_GPIO_PORT, TIMx_CH1_GPIO_PIN);
 }
 
-static	void	pwm_tim2_ch2_gpio_init		(void)
-{
-	GPIO_InitTypeDef	gpio;
-
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	gpio.Pin	= GPIO_PIN_1;
-	gpio.Mode	= PWM_OUTPUT_MODE;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Speed	= GPIO_SPEED_FREQ_LOW;
-	gpio.Alternate	= GPIO_AF1_TIM2;
-	HAL_GPIO_Init(GPIOA, &gpio);
-}
-
-static	void	pwm_tim2_ch2_gpio_deinit	(void)
-{
-
-	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1);
-}
-
-static	void	pwm_tim2_ch3_gpio_init		(void)
+static	void	pwm_timx_ch2_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-
-	gpio.Pin	= GPIO_PIN_10;
-	gpio.Mode	= PWM_OUTPUT_MODE;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Speed	= GPIO_SPEED_FREQ_LOW;
-	gpio.Alternate	= GPIO_AF1_TIM2;
-	HAL_GPIO_Init(GPIOB, &gpio);
+	TIMx_CH2_GPIO_CLK_ENABLE();
+	gpio.Pin	= TIMx_CH2_GPIO_PIN;
+	gpio.Mode	= TIMx_CH2_GPIO_MODE;
+	gpio.Pull	= TIMx_CH2_GPIO_PULL;
+	gpio.Speed	= TIMx_CH2_GPIO_SPEED;
+	gpio.Alternate	= TIMx_CH2_GPIO_ALT;
+	HAL_GPIO_Init(TIMx_CH2_GPIO_PORT, &gpio);
 }
 
-static	void	pwm_tim2_ch3_gpio_deinit	(void)
+static	void	pwm_timx_ch2_gpio_deinit	(void)
 {
 
-	HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10);
+	HAL_GPIO_DeInit(TIMx_CH2_GPIO_PORT, TIMx_CH2_GPIO_PIN);
 }
 
-static	void	pwm_tim2_ch4_gpio_init		(void)
+static	void	pwm_timx_ch3_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-
-	gpio.Pin	= GPIO_PIN_11;
-	gpio.Mode	= PWM_OUTPUT_MODE;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Speed	= GPIO_SPEED_FREQ_LOW;
-	gpio.Alternate	= GPIO_AF1_TIM2;
-	HAL_GPIO_Init(GPIOB, &gpio);
+	TIMx_CH3_GPIO_CLK_ENABLE();
+	gpio.Pin	= TIMx_CH3_GPIO_PIN;
+	gpio.Mode	= TIMx_CH3_GPIO_MODE;
+	gpio.Pull	= TIMx_CH3_GPIO_PULL;
+	gpio.Speed	= TIMx_CH3_GPIO_SPEED;
+	gpio.Alternate	= TIMx_CH3_GPIO_ALT;
+	HAL_GPIO_Init(TIMx_CH3_GPIO_PORT, &gpio);
 }
 
-static	void	pwm_tim2_ch4_gpio_deinit	(void)
+static	void	pwm_timx_ch3_gpio_deinit	(void)
 {
 
-	HAL_GPIO_DeInit(GPIOB, GPIO_PIN_11);
+	HAL_GPIO_DeInit(TIMx_CH3_GPIO_PORT, TIMx_CH3_GPIO_PIN);
+}
+
+static	void	pwm_timx_ch4_gpio_init		(void)
+{
+	GPIO_InitTypeDef	gpio;
+
+	TIMx_CH4_GPIO_CLK_ENABLE();
+	gpio.Pin	= TIMx_CH4_GPIO_PIN;
+	gpio.Mode	= TIMx_CH4_GPIO_MODE;
+	gpio.Pull	= TIMx_CH4_GPIO_PULL;
+	gpio.Speed	= TIMx_CH4_GPIO_SPEED;
+	gpio.Alternate	= TIMx_CH4_GPIO_ALT;
+	HAL_GPIO_Init(TIMx_CH4_GPIO_PORT, &gpio);
+}
+
+static	void	pwm_timx_ch4_gpio_deinit	(void)
+{
+
+	HAL_GPIO_DeInit(TIMx_CH4_GPIO_PORT, TIMx_CH4_GPIO_PIN);
 }
 
 

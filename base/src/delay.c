@@ -32,7 +32,11 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-	# define	RESOLUTION_1_US		(1000000u)
+# define	RESOLUTION_1_US		(1000000u)
+
+# define	TIMx_INSTANCE		(TIM6)
+# define	TIMx_CLK_ENABLE()	__HAL_RCC_TIM6_CLK_ENABLE()
+# define	TIMx_CLK_DISABLE()	__HAL_RCC_TIM6_CLK_DISABLE()
 
 
 /******************************************************************************
@@ -81,7 +85,7 @@ int	delay_us_init	(void)
 		return	ERROR_OK;
 	}
 
-	__HAL_RCC_TIM6_CLK_ENABLE();
+	TIMx_CLK_ENABLE();
 	if (delay_us_tim_init()) {
 		prj_error	|= ERROR_DELAY_HAL_TIM_INIT;
 		prj_error_handle();
@@ -92,7 +96,8 @@ int	delay_us_init	(void)
 
 
 err_init:
-	__HAL_RCC_TIM6_CLK_DISABLE();
+	TIMx_CLK_DISABLE();
+	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -119,7 +124,7 @@ int	delay_us_deinit	(void)
 		prj_error_handle();
 		status	= ERROR_NOK;
 	}
-	__HAL_RCC_TIM6_CLK_DISABLE();
+	TIMx_CLK_DISABLE();
 
 	return	status;
 }
@@ -173,7 +178,7 @@ int	delay_us	(uint32_t time_us)
 static	int	delay_us_tim_init	(void)
 {
 
-	tim.Instance		= TIM6; 
+	tim.Instance		= TIMx_INSTANCE; 
 	tim.Init.Prescaler		= (SystemCoreClock / RESOLUTION_1_US) -
 									1u;
 	tim.Init.CounterMode		= TIM_COUNTERMODE_UP;

@@ -32,7 +32,60 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-	# define	SPI_TIMEOUT	(500)
+# define	SPIx_INSTANCE			(SPI1)
+# define	SPIx_CLK_ENABLE()		__HAL_RCC_SPI1_CLK_ENABLE()
+# define	SPIx_CLK_DISABLE()		__HAL_RCC_SPI1_CLK_DISABLE()
+
+# define	SPIx_nSS_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
+# define	SPIx_nSS_GPIO_PORT		(GPIOA)
+# define	SPIx_nSS_GPIO_PIN		(GPIO_PIN_4)
+# define	SPIx_nSS_GPIO_MODE		(GPIO_MODE_AF_PP)
+# define	SPIx_nSS_GPIO_SPEED		(GPIO_SPEED_FREQ_HIGH)
+# define	SPIx_nSS_GPIO_PULL		(GPIO_NOPULL)
+# define	SPIx_nSS_GPIO_ALT		(GPIO_AF5_SPI1)
+
+# define	SPIx_SCK_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
+# define	SPIx_SCK_GPIO_PORT		(GPIOA)
+# define	SPIx_SCK_GPIO_PIN		(GPIO_PIN_5)
+# define	SPIx_SCK_GPIO_MODE		(GPIO_MODE_AF_PP)
+# define	SPIx_SCK_GPIO_SPEED		(GPIO_SPEED_FREQ_HIGH)
+# define	SPIx_SCK_GPIO_PULL		(GPIO_NOPULL)
+# define	SPIx_SCK_GPIO_ALT		(GPIO_AF5_SPI1)
+
+# define	SPIx_MISO_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
+# define	SPIx_MISO_GPIO_PORT		(GPIOA)
+# define	SPIx_MISO_GPIO_PIN		(GPIO_PIN_6)
+# define	SPIx_MISO_GPIO_MODE		(GPIO_MODE_AF_PP)
+# define	SPIx_MISO_GPIO_SPEED		(GPIO_SPEED_FREQ_HIGH)
+# define	SPIx_MISO_GPIO_PULL		(GPIO_NOPULL)
+# define	SPIx_MISO_GPIO_ALT		(GPIO_AF5_SPI1)
+
+# define	SPIx_MOSI_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
+# define	SPIx_MOSI_GPIO_PORT		(GPIOA)
+# define	SPIx_MOSI_GPIO_PIN		(GPIO_PIN_7)
+# define	SPIx_MOSI_GPIO_MODE		(GPIO_MODE_AF_PP)
+# define	SPIx_MOSI_GPIO_SPEED		(GPIO_SPEED_FREQ_HIGH)
+# define	SPIx_MOSI_GPIO_PULL		(GPIO_NOPULL)
+# define	SPIx_MOSI_GPIO_ALT		(GPIO_AF5_SPI1)
+
+# define	SPIx_IRQHandler			SPI1_IRQHandler
+# define	SPIx_IRQn			(SPI1_IRQn)
+# define	SPIx_PREEMPT_PRIORITY		(1)
+# define	SPIx_SUB_PRIORITY		(0)
+
+# define	SPIx_INIT_BAUD_RATE_PRESCALER	(SPI_BAUDRATEPRESCALER_32)
+# define	SPIx_INIT_DIRECTION		(SPI_DIRECTION_2LINES)
+# define	SPIx_INIT_CLK_PHASE		(SPI_PHASE_1EDGE)
+# define	SPIx_INIT_CLK_POLARITY		(SPI_POLARITY_LOW)
+# define	SPIx_INIT_DATA_SIZE		(SPI_DATASIZE_8BIT)
+# define	SPIx_INIT_FIRST_BIT		(SPI_FIRSTBIT_MSB)
+# define	SPIx_INIT_TI_MODE		(SPI_TIMODE_DISABLE)
+# define	SPIx_INIT_CRC_CALCULATION	(SPI_CRCCALCULATION_DISABLE)
+# define	SPIx_INIT_CRC_POLYNOMIAL	(7)
+# define	SPIx_INIT_CRC_LENGTH		(SPI_CRC_LENGTH_8BIT)
+# define	SPIx_INIT_NSS			(SPI_NSS_SOFT)
+# define	SPIx_INIT_NSSP_MODE		(SPI_NSS_PULSE_DISABLE)
+# define	SPIx_INIT_MODE			(SPI_MODE_MASTER)
 
 
 /******************************************************************************
@@ -62,6 +115,8 @@ static	void	spi_msp_init		(void);
 static	void	spi_msp_deinit		(void);
 static	void	spi_gpio_init		(void);
 static	void	spi_gpio_deinit		(void);
+static	void	spi_nvic_conf		(void);
+static	void	spi_nvic_deconf		(void);
 static	int	spi_peripherial_init	(void);
 static	int	spi_peripherial_deinit	(void);
 
@@ -84,6 +139,7 @@ int	spi_init	(void)
 	}
 
 	spi_msp_init();
+
 	if (spi_peripherial_init()) {
 		prj_error	|= ERROR_SPI_HAL_SPI_INIT;
 		prj_error_handle();
@@ -95,6 +151,7 @@ int	spi_init	(void)
 
 err_peripherial:
 	spi_msp_deinit();
+	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -132,9 +189,10 @@ int	spi_deinit	(void)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	spi_msg_write	(uint16_t data)
+int	spi_msg_write	(uint8_t data_len, uint8_t data [data_len])
 {
-	uint8_t	spi_data [sizeof(uint16_t) / sizeof(uint8_t)];
+	uint8_t	buff [data_len];
+	int	i;
 
 	if (init_pending) {
 		if (spi_init()) {
@@ -144,23 +202,37 @@ int	spi_msg_write	(uint16_t data)
 		}
 	}
 
-	spi_data[0]	= data / (UINT8_MAX + 1u);
-	spi_data[1]	= data % (UINT8_MAX + 1u);
+	for (i = 0; i < data_len; i++) {
+		buff[i]	= data[i];
+	}
 
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(SPIx_nSS_GPIO_PORT, SPIx_nSS_GPIO_PIN, GPIO_PIN_RESET);
 
-	if (HAL_SPI_Transmit(&spi, spi_data, 1, SPI_TIMEOUT)) {
+	if (HAL_SPI_Transmit_IT(&spi, buff, data_len)) {
 		prj_error	|= ERROR_SPI_HAL_SPI_TRANSMIT;
 		prj_error_handle();
 		return	ERROR_NOK;
 	}
 	while (HAL_SPI_GetState(&spi) != HAL_SPI_STATE_READY) {
-		/* Empty loop */
+		__NOP();
 	}
 
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(SPIx_nSS_GPIO_PORT, SPIx_nSS_GPIO_PIN, GPIO_PIN_SET);
 
 	return	ERROR_OK;
+}
+
+
+/******************************************************************************
+ ******* HAL weak functions (redefinitions) ***********************************
+ ******************************************************************************/
+	/**
+	 * @brief	Handle I2C event interrupt request
+	 */
+void	SPIx_IRQHandler			(void)
+{
+
+	HAL_SPI_IRQHandler(&spi);
 }
 
 
@@ -170,49 +242,54 @@ int	spi_msg_write	(uint16_t data)
 static	void	spi_msp_init		(void)
 {
 
-	__SPI2_CLK_ENABLE();
+	SPIx_CLK_ENABLE();
 	spi_gpio_init();
+	spi_nvic_conf();
 }
 
 static	void	spi_msp_deinit		(void)
 {
 
+	spi_nvic_deconf();
 	spi_gpio_deinit();
-	__SPI2_CLK_DISABLE();
+	SPIx_CLK_DISABLE();
 }
 
 static	void	spi_gpio_init		(void)
 {
 	GPIO_InitTypeDef	gpio;
 
-	__HAL_RCC_GPIOA_CLK_ENABLE();
+	SPIx_nSS_GPIO_CLK_ENABLE();
+	gpio.Pin	= SPIx_nSS_GPIO_PIN;
+	gpio.Mode	= SPIx_nSS_GPIO_MODE;
+	gpio.Speed	= SPIx_nSS_GPIO_SPEED;
+	gpio.Pull	= SPIx_nSS_GPIO_PULL;
+	gpio.Alternate	= SPIx_nSS_GPIO_ALT;
+	HAL_GPIO_Init(SPIx_nSS_GPIO_PORT, &gpio);
 
-	gpio.Pin	= GPIO_PIN_4;
-	gpio.Mode	= GPIO_MODE_AF_PP;
-	gpio.Speed	= GPIO_SPEED_FREQ_HIGH;
-	gpio.Pull	= GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOA, &gpio);
+	SPIx_SCK_GPIO_CLK_ENABLE();
+	gpio.Pin	= SPIx_SCK_GPIO_PIN;
+	gpio.Mode	= SPIx_SCK_GPIO_MODE;
+	gpio.Speed	= SPIx_SCK_GPIO_SPEED;
+	gpio.Pull	= SPIx_SCK_GPIO_PULL;
+	gpio.Alternate	= SPIx_SCK_GPIO_ALT;
+	HAL_GPIO_Init(SPIx_SCK_GPIO_PORT, &gpio);
 
-	gpio.Pin	= GPIO_PIN_5;
-	gpio.Mode	= GPIO_MODE_AF_PP;
-	gpio.Speed	= GPIO_SPEED_FREQ_HIGH;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Alternate	= GPIO_AF5_SPI1;
-	HAL_GPIO_Init(GPIOA, &gpio);
+	SPIx_MISO_GPIO_CLK_ENABLE();
+	gpio.Pin	= SPIx_MISO_GPIO_PIN;
+	gpio.Mode	= SPIx_MISO_GPIO_MODE;
+	gpio.Speed	= SPIx_MISO_GPIO_SPEED;
+	gpio.Pull	= SPIx_MISO_GPIO_PULL;
+	gpio.Alternate	= SPIx_MISO_GPIO_ALT;
+	HAL_GPIO_Init(SPIx_MISO_GPIO_PORT, &gpio);
 
-	gpio.Pin	= GPIO_PIN_6;
-	gpio.Mode	= GPIO_MODE_AF_PP;
-	gpio.Speed	= GPIO_SPEED_FREQ_HIGH;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Alternate	= GPIO_AF5_SPI1;
-	HAL_GPIO_Init(GPIOA, &gpio);
-
-	gpio.Pin	= GPIO_PIN_7;
-	gpio.Mode	= GPIO_MODE_AF_PP;
-	gpio.Speed	= GPIO_SPEED_FREQ_HIGH;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Alternate	= GPIO_AF5_SPI1;
-	HAL_GPIO_Init(GPIOA, &gpio);
+	SPIx_MOSI_GPIO_CLK_ENABLE();
+	gpio.Pin	= SPIx_MOSI_GPIO_PIN;
+	gpio.Mode	= SPIx_MOSI_GPIO_MODE;
+	gpio.Speed	= SPIx_MOSI_GPIO_SPEED;
+	gpio.Pull	= SPIx_MOSI_GPIO_PULL;
+	gpio.Alternate	= SPIx_MOSI_GPIO_ALT;
+	HAL_GPIO_Init(SPIx_MOSI_GPIO_PORT, &gpio);
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 }
@@ -220,26 +297,42 @@ static	void	spi_gpio_init		(void)
 static	void	spi_gpio_deinit		(void)
 {
 
-	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_4);
-	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5);
-	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_6);
-	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_7);
+	HAL_GPIO_DeInit(SPIx_nSS_GPIO_PORT, SPIx_nSS_GPIO_PIN);
+	HAL_GPIO_DeInit(SPIx_SCK_GPIO_PORT, SPIx_SCK_GPIO_PIN);
+	HAL_GPIO_DeInit(SPIx_MISO_GPIO_PORT, SPIx_MISO_GPIO_PIN);
+	HAL_GPIO_DeInit(SPIx_MOSI_GPIO_PORT, SPIx_MOSI_GPIO_PIN);
+}
+
+static	void	spi_nvic_conf		(void)
+{
+
+	HAL_NVIC_SetPriority(SPIx_IRQn, SPIx_PREEMPT_PRIORITY, SPIx_SUB_PRIORITY);
+	HAL_NVIC_EnableIRQ(SPIx_IRQn);
+}
+
+static	void	spi_nvic_deconf		(void)
+{
+
+	HAL_NVIC_DisableIRQ(SPIx_IRQn);
 }
 
 static	int	spi_peripherial_init	(void)
 {
 
-	spi.Instance		= SPI1;
-	spi.Init.BaudRatePrescaler	= SPI_BAUDRATEPRESCALER_32;
-	spi.Init.Direction		= SPI_DIRECTION_2LINES;
-	spi.Init.CLKPhase		= SPI_PHASE_1EDGE;
-	spi.Init.CLKPolarity		= SPI_POLARITY_LOW;
-	spi.Init.CRCCalculation		= SPI_CRCCALCULATION_DISABLE;
-	spi.Init.DataSize		= SPI_DATASIZE_16BIT;
-	spi.Init.FirstBit		= SPI_FIRSTBIT_MSB;
-	spi.Init.NSS			= SPI_NSS_SOFT;
-	spi.Init.TIMode			= SPI_TIMODE_DISABLE;
-	spi.Init.Mode			= SPI_MODE_MASTER;
+	spi.Instance		= SPIx_INSTANCE;
+	spi.Init.BaudRatePrescaler	= SPIx_INIT_BAUD_RATE_PRESCALER;
+	spi.Init.Direction		= SPIx_INIT_DIRECTION;
+	spi.Init.CLKPhase		= SPIx_INIT_CLK_PHASE;
+	spi.Init.CLKPolarity		= SPIx_INIT_CLK_POLARITY;
+	spi.Init.DataSize		= SPIx_INIT_DATA_SIZE;
+	spi.Init.FirstBit		= SPIx_INIT_FIRST_BIT;
+	spi.Init.TIMode			= SPIx_INIT_TI_MODE;
+	spi.Init.CRCCalculation		= SPIx_INIT_CRC_CALCULATION;
+	spi.Init.CRCPolynomial		= SPIx_INIT_CRC_POLYNOMIAL;
+	spi.Init.CRCLength		= SPIx_INIT_CRC_LENGTH;
+	spi.Init.NSS			= SPIx_INIT_NSS;
+	spi.Init.NSSPMode		= SPIx_INIT_NSSP_MODE;
+	spi.Init.Mode			= SPIx_INIT_MODE;
 
 	return	HAL_SPI_Init(&spi);
 }

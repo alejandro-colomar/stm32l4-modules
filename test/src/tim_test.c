@@ -80,7 +80,7 @@ int	tim_test	(void)
 		return	ERROR_NOK;
 	}
 	led_init();
-	if (tim_tim3_init(period_us)) {
+	if (tim_timx_init(period_us)) {
 		return	ERROR_NOK;
 	}
 
@@ -110,10 +110,10 @@ static	int	execution_loop	(float period_us)
 	while (true) {
 		__WFI();
 
-		if (tim_tim3_interrupt) {
+		if (tim_timx_interrupt) {
 			flash(period_us);
 
-			tim_tim3_interrupt	= false;
+			tim_timx_interrupt	= false;
 		}
 	}
 

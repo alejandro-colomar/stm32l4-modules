@@ -29,7 +29,13 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-	# define	RESOLUTION_1_US		(1000000u)
+# define	RESOLUTION_1_US		(1000000u)
+
+# define	TIMx_INSTANCE		(TIM3)
+# define	TIMx_CLK_ENABLE()	__HAL_RCC_TIM3_CLK_ENABLE()
+# define	TIMx_CLK_DISABLE()	__HAL_RCC_TIM3_CLK_DISABLE()
+
+# define	TIMx_IRQHandler		TIM3_IRQHandler
 
 
 /******************************************************************************
@@ -46,7 +52,7 @@
  ******* variables ************************************************************
  ******************************************************************************/
 /* Volatile ------------------------------------------------------------------*/
-	volatile	bool	tim_tim3_interrupt;
+	volatile	bool	tim_timx_interrupt;
 /* Global --------------------------------------------------------------------*/
 /* Static --------------------------------------------------------------------*/
 static	bool			init_pending	= true;
@@ -56,20 +62,20 @@ static	TIM_HandleTypeDef	tim;
 /******************************************************************************
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
-static	int	tim_tim3_tim_init	(uint16_t period_ms);
-static	int	tim_tim3_tim_deinit	(void);
+static	int	tim_timx_tim_init	(uint16_t period_ms);
+static	int	tim_timx_tim_deinit	(void);
 
 
 /******************************************************************************
  ******* global functions *****************************************************
  ******************************************************************************/
 	/**
-	 * @brief	Initialize periodic interrupts using TIM3
-	 * @param	freq_hz:	frequency of interrupts in Hz
+	 * @brief	Initialize periodic interrupts using TIMx
+	 * @param	period_us:	period of interrupts in us
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	tim_tim3_init		(uint16_t period_us)
+int	tim_timx_init		(uint16_t period_us)
 {
 
 	if (init_pending) {
@@ -78,10 +84,10 @@ int	tim_tim3_init		(uint16_t period_us)
 		return	ERROR_OK;
 	}
 
-	tim_tim3_interrupt	= false;
+	tim_timx_interrupt	= false;
 
-	__HAL_RCC_TIM3_CLK_ENABLE();
-	if (tim_tim3_tim_init(period_us)) {
+	TIMx_CLK_ENABLE();
+	if (tim_timx_tim_init(period_us)) {
 		prj_error	|= ERROR_TIM_HAL_TIM_INIT;
 		prj_error_handle();
 		goto err_init;
@@ -96,23 +102,24 @@ int	tim_tim3_init		(uint16_t period_us)
 
 
 err_start:
-	if (tim_tim3_tim_deinit()) {
+	if (tim_timx_tim_deinit()) {
 		prj_error	|= ERROR_TIM_HAL_TIM_DEINIT;
 		prj_error_handle();
 	}
 
 err_init:
-	__HAL_RCC_TIM3_CLK_DISABLE();
+	TIMx_CLK_DISABLE();
+	init_pending	= true;
 
 	return	ERROR_NOK;
 }
 
 	/**
-	 * @brief	Deinitialize periodic interrupts using TIM3
+	 * @brief	Deinitialize periodic interrupts using TIMx
 	 *		Sets global variable 'error'
 	 * @return	Error
 	 */
-int	tim_tim3_deinit		(void)
+int	tim_timx_deinit		(void)
 {
 	int	status;
 
@@ -129,12 +136,12 @@ int	tim_tim3_deinit		(void)
 		prj_error_handle();
 		status	= ERROR_NOK;
 	}
-	if (tim_tim3_tim_deinit()) {
+	if (tim_timx_tim_deinit()) {
 		prj_error	|= ERROR_TIM_HAL_TIM_DEINIT;
 		prj_error_handle();
 		status	= ERROR_NOK;
 	}
-	__HAL_RCC_TIM3_CLK_DISABLE();
+	TIMx_CLK_DISABLE();
 
 	return	status;
 }
@@ -144,9 +151,9 @@ int	tim_tim3_deinit		(void)
  ******* HAL weak functions (redefinitions) ***********************************
  ******************************************************************************/
 	/**
-	 * @brief	Handle TIM3 interrupt request
+	 * @brief	Handle TIMx interrupt request
 	 */
-void	TIM3_IRQHandler			(void)
+void	TIMx_IRQHandler			(void)
 {
 
 	HAL_TIM_IRQHandler(&tim);
@@ -159,11 +166,8 @@ void	TIM3_IRQHandler			(void)
 void	HAL_TIM_PeriodElapsedCallback	(TIM_HandleTypeDef *tim_ptr)
 {
 
-	if (tim_ptr->Instance == TIM1) {
-	} else if (tim_ptr->Instance == TIM2) {
-	} else if (tim_ptr->Instance == TIM3) {
-		tim_tim3_interrupt	= true;
-	} else {
+	if (tim_ptr->Instance == TIMx_INSTANCE) {
+		tim_timx_interrupt	= true;
 	}
 }
 
@@ -171,10 +175,10 @@ void	HAL_TIM_PeriodElapsedCallback	(TIM_HandleTypeDef *tim_ptr)
 /******************************************************************************
  ******* static functions (definitions) ***************************************
  ******************************************************************************/
-static	int	tim_tim3_tim_init	(uint16_t period_us)
+static	int	tim_timx_tim_init	(uint16_t period_us)
 {
 
-	tim.Instance		= TIM3;
+	tim.Instance		= TIMx_INSTANCE;
 	tim.Init.Prescaler		= (SystemCoreClock / RESOLUTION_1_US) -
 									1;
 	tim.Init.CounterMode		= TIM_COUNTERMODE_UP;
@@ -185,7 +189,7 @@ static	int	tim_tim3_tim_init	(uint16_t period_us)
 	return	HAL_TIM_Base_Init(&tim);
 }
 
-static	int	tim_tim3_tim_deinit	(void)
+static	int	tim_timx_tim_deinit	(void)
 {
 
 	return	HAL_TIM_Base_DeInit(&tim);

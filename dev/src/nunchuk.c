@@ -125,6 +125,7 @@ err_slave:
 		prj_error_handle();
 	}
 err_init:
+	init_pending	= true;
 
 	return	ERROR_NOK;
 }

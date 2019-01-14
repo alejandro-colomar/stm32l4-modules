@@ -31,6 +31,12 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
+# define	LED_G_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOA_CLK_ENABLE()
+# define	LED_G_GPIO_PORT			(GPIOA)
+# define	LED_G_GPIO_PIN			(GPIO_PIN_5)
+# define	LED_G_GPIO_MODE			(GPIO_MODE_OUTPUT_PP)
+# define	LED_G_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+# define	LED_G_GPIO_PULL			(GPIO_NOPULL)
 
 
 /******************************************************************************
@@ -106,7 +112,7 @@ void	led_set		(void)
 		led_init();
 	}
 
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LED_G_GPIO_PORT, LED_G_GPIO_PIN, GPIO_PIN_SET);
 }
 
 	/**
@@ -119,7 +125,7 @@ void	led_reset	(void)
 		led_init();
 	}
 
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED_G_GPIO_PORT, LED_G_GPIO_PIN, GPIO_PIN_RESET);
 }
 
 
@@ -130,19 +136,18 @@ static	void	led_gpio_init	(void)
 {
 	GPIO_InitTypeDef	gpio;
 	
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	gpio.Pin	= GPIO_PIN_5;
-	gpio.Mode	= GPIO_MODE_OUTPUT_PP;
-	gpio.Pull	= GPIO_NOPULL;
-	gpio.Speed	= GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIOA, &gpio);
+	LED_G_GPIO_CLK_ENABLE();
+	gpio.Pin	= LED_G_GPIO_PIN;
+	gpio.Mode	= LED_G_GPIO_MODE;
+	gpio.Speed	= LED_G_GPIO_SPEED;
+	gpio.Pull	= LED_G_GPIO_PULL;
+	HAL_GPIO_Init(LED_G_GPIO_PORT, &gpio);
 }
 
 static	void	led_gpio_deinit	(void)
 {
 
-	HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5);
+	HAL_GPIO_DeInit(LED_G_GPIO_PORT, LED_G_GPIO_PIN);
 }
 
 
