@@ -128,6 +128,19 @@ void	led_reset	(void)
 	HAL_GPIO_WritePin(LED_G_GPIO_PORT, LED_G_GPIO_PIN, GPIO_PIN_RESET);
 }
 
+	/**
+	 * @brief	LED toggle
+	 */
+void	led_toggle	(void)
+{
+
+	if (init_pending) {
+		led_init();
+	}
+
+	HAL_GPIO_TogglePin(LED_G_GPIO_PORT, LED_G_GPIO_PIN);
+}
+
 
 /******************************************************************************
  ******* static functions (definitions) ***************************************
@@ -135,7 +148,7 @@ void	led_reset	(void)
 static	void	led_gpio_init	(void)
 {
 	GPIO_InitTypeDef	gpio;
-	
+
 	LED_G_GPIO_CLK_ENABLE();
 	gpio.Pin	= LED_G_GPIO_PIN;
 	gpio.Mode	= LED_G_GPIO_MODE;
