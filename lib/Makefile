@@ -15,7 +15,9 @@ ALL		= \
 		libstm32l4-modules-dev.a \
 		libstm32l4-modules-test.a
 
-MODS_OBJ_BASE	= can.o clk.o delay.o errors.o i2c.o led.o pwm.o spi.o tim.o
+MODS_OBJ_BASE	= \
+		button.o can.o clk.o delay.o errors.o i2c.o led.o pwm.o spi.o \
+		tim.o
 MODS_BASE_OBJS	= $(patsubst %,$(BASE_TMP_DIR)/%,$(MODS_OBJ_BASE))
 
 
