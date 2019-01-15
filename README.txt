@@ -43,9 +43,9 @@ Please follow the Linux Kernel coding style for any code that you may submit:
 
 
 site:
-	https://github.com/AlejandroColomar/stm32l4-modules
+	https://github.com/alejandro-colomar/stm32l4-modules
 
 example of a project based on this library:
-	https://github.com/AlejandroColomar/stm32l4-project-plane
+	https://github.com/alejandro-colomar/stm32l4-project-plane
 
 
