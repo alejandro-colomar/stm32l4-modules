@@ -132,13 +132,12 @@ void	EXTIx_IRQHandler	(void)
 	 */
 void	HAL_GPIO_EXTI_Callback	(uint16_t  gpio_pin)
 {
-	(void)gpio_pin;
 
-//	switch (gpio_pin) {
-//	case BUTTON_GPIO_PIN:
+	switch (gpio_pin) {
+	case BUTTON_GPIO_PIN:
 		button_interrupt	= true;
-//		break;
-//	}
+		break;
+	}
 }
 
 
@@ -147,12 +146,13 @@ void	HAL_GPIO_EXTI_Callback	(uint16_t  gpio_pin)
  ******************************************************************************/
 static	void	button_gpio_init	(void)
 {
-	GPIO_InitTypeDef	gpio;
+	GPIO_InitTypeDef	gpio	= {
+		.Pin	= BUTTON_GPIO_PIN,
+		.Mode	= BUTTON_GPIO_MODE,
+		.Pull	= BUTTON_GPIO_PULL
+	};
 
 	BUTTON_GPIO_CLK_ENABLE();
-	gpio.Pin	= BUTTON_GPIO_PIN;
-	gpio.Mode	= BUTTON_GPIO_MODE;
-	gpio.Pull	= BUTTON_GPIO_PULL;
 	HAL_GPIO_Init(BUTTON_GPIO_PORT, &gpio);
 }
 

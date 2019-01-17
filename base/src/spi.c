@@ -260,35 +260,43 @@ static	void	spi_gpio_init		(void)
 	GPIO_InitTypeDef	gpio;
 
 	SPIx_nSS_GPIO_CLK_ENABLE();
-	gpio.Pin	= SPIx_nSS_GPIO_PIN;
-	gpio.Mode	= SPIx_nSS_GPIO_MODE;
-	gpio.Speed	= SPIx_nSS_GPIO_SPEED;
-	gpio.Pull	= SPIx_nSS_GPIO_PULL;
-	gpio.Alternate	= SPIx_nSS_GPIO_ALT;
+	gpio	= (GPIO_InitTypeDef){
+		.Pin		= SPIx_nSS_GPIO_PIN,
+		.Mode		= SPIx_nSS_GPIO_MODE,
+		.Pull		= SPIx_nSS_GPIO_PULL,
+		.Speed		= SPIx_nSS_GPIO_SPEED,
+		.Alternate	= SPIx_nSS_GPIO_ALT,
+	};
 	HAL_GPIO_Init(SPIx_nSS_GPIO_PORT, &gpio);
 
 	SPIx_SCK_GPIO_CLK_ENABLE();
-	gpio.Pin	= SPIx_SCK_GPIO_PIN;
-	gpio.Mode	= SPIx_SCK_GPIO_MODE;
-	gpio.Speed	= SPIx_SCK_GPIO_SPEED;
-	gpio.Pull	= SPIx_SCK_GPIO_PULL;
-	gpio.Alternate	= SPIx_SCK_GPIO_ALT;
+	gpio	= (GPIO_InitTypeDef){
+		.Pin		= SPIx_SCK_GPIO_PIN,
+		.Mode		= SPIx_SCK_GPIO_MODE,
+		.Pull		= SPIx_SCK_GPIO_PULL,
+		.Speed		= SPIx_SCK_GPIO_SPEED,
+		.Alternate	= SPIx_SCK_GPIO_ALT,
+	};
 	HAL_GPIO_Init(SPIx_SCK_GPIO_PORT, &gpio);
 
 	SPIx_MISO_GPIO_CLK_ENABLE();
-	gpio.Pin	= SPIx_MISO_GPIO_PIN;
-	gpio.Mode	= SPIx_MISO_GPIO_MODE;
-	gpio.Speed	= SPIx_MISO_GPIO_SPEED;
-	gpio.Pull	= SPIx_MISO_GPIO_PULL;
-	gpio.Alternate	= SPIx_MISO_GPIO_ALT;
+	gpio	= (GPIO_InitTypeDef){
+		.Pin		= SPIx_MISO_GPIO_PIN,
+		.Mode		= SPIx_MISO_GPIO_MODE,
+		.Pull		= SPIx_MISO_GPIO_PULL,
+		.Speed		= SPIx_MISO_GPIO_SPEED,
+		.Alternate	= SPIx_MISO_GPIO_ALT,
+	};
 	HAL_GPIO_Init(SPIx_MISO_GPIO_PORT, &gpio);
 
 	SPIx_MOSI_GPIO_CLK_ENABLE();
-	gpio.Pin	= SPIx_MOSI_GPIO_PIN;
-	gpio.Mode	= SPIx_MOSI_GPIO_MODE;
-	gpio.Speed	= SPIx_MOSI_GPIO_SPEED;
-	gpio.Pull	= SPIx_MOSI_GPIO_PULL;
-	gpio.Alternate	= SPIx_MOSI_GPIO_ALT;
+	gpio	= (GPIO_InitTypeDef){
+		.Pin		= SPIx_MOSI_GPIO_PIN,
+		.Mode		= SPIx_MOSI_GPIO_MODE,
+		.Pull		= SPIx_MOSI_GPIO_PULL,
+		.Speed		= SPIx_MOSI_GPIO_SPEED,
+		.Alternate	= SPIx_MOSI_GPIO_ALT,
+	};
 	HAL_GPIO_Init(SPIx_MOSI_GPIO_PORT, &gpio);
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
@@ -319,20 +327,24 @@ static	void	spi_nvic_deconf		(void)
 static	int	spi_peripherial_init	(void)
 {
 
-	spi.Instance		= SPIx_INSTANCE;
-	spi.Init.BaudRatePrescaler	= SPIx_INIT_BAUD_RATE_PRESCALER;
-	spi.Init.Direction		= SPIx_INIT_DIRECTION;
-	spi.Init.CLKPhase		= SPIx_INIT_CLK_PHASE;
-	spi.Init.CLKPolarity		= SPIx_INIT_CLK_POLARITY;
-	spi.Init.DataSize		= SPIx_INIT_DATA_SIZE;
-	spi.Init.FirstBit		= SPIx_INIT_FIRST_BIT;
-	spi.Init.TIMode			= SPIx_INIT_TI_MODE;
-	spi.Init.CRCCalculation		= SPIx_INIT_CRC_CALCULATION;
-	spi.Init.CRCPolynomial		= SPIx_INIT_CRC_POLYNOMIAL;
-	spi.Init.CRCLength		= SPIx_INIT_CRC_LENGTH;
-	spi.Init.NSS			= SPIx_INIT_NSS;
-	spi.Init.NSSPMode		= SPIx_INIT_NSSP_MODE;
-	spi.Init.Mode			= SPIx_INIT_MODE;
+	spi	= (SPI_HandleTypeDef) {
+		.Instance	= SPIx_INSTANCE,
+		.Init		= {
+			.BaudRatePrescaler	= SPIx_INIT_BAUD_RATE_PRESCALER,
+			.Direction		= SPIx_INIT_DIRECTION,
+			.CLKPhase		= SPIx_INIT_CLK_PHASE,
+			.CLKPolarity		= SPIx_INIT_CLK_POLARITY,
+			.DataSize		= SPIx_INIT_DATA_SIZE,
+			.FirstBit		= SPIx_INIT_FIRST_BIT,
+			.TIMode			= SPIx_INIT_TI_MODE,
+			.CRCCalculation		= SPIx_INIT_CRC_CALCULATION,
+			.CRCPolynomial		= SPIx_INIT_CRC_POLYNOMIAL,
+			.CRCLength		= SPIx_INIT_CRC_LENGTH,
+			.NSS			= SPIx_INIT_NSS,
+			.NSSPMode		= SPIx_INIT_NSSP_MODE,
+			.Mode			= SPIx_INIT_MODE
+		}
+	};
 
 	return	HAL_SPI_Init(&spi);
 }
