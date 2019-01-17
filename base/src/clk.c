@@ -54,29 +54,6 @@
 /******************************************************************************
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
-#if 0
-static	int	clk_hse_set		(void);
-static	int	clk_hse_off		(void);
-#endif
-static	int	clk_hsi_set		(void);
-static	int	clk_hsi_off		(void);
-#if 0
-static	int	clk_lse_set		(void);
-static	int	clk_lse_off		(void);
-static	int	clk_lsi_set		(void);
-static	int	clk_lsi_off		(void);
-#endif
-static	int	clk_msi_set		(void);
-static	int	clk_msi_off		(void);
-static	int	clk_pll_set_from_hsi	(void);
-static	int	clk_pll_set_from_msi	(void);
-static	int	clk_pll_off		(void);
-#if 0
-static	int	clk_sysclk_set_from_hse	(void);
-#endif
-static	int	clk_sysclk_set_from_hsi	(void);
-static	int	clk_sysclk_set_from_msi	(void);
-static	int	clk_sysclk_set_from_pll	(void);
 
 
 /******************************************************************************
@@ -254,13 +231,8 @@ void	sysclk_config_pll_msi	(void)
 		}
 	}
 }
-
-
-/******************************************************************************
- ******* static functions (definitions) ***************************************
- ******************************************************************************/
 #if 0
-static	int	clk_hse_set		(void)
+int	clk_hse_set		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_HSE,
@@ -271,7 +243,7 @@ static	int	clk_hse_set		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
-static	int	clk_hse_off		(void)
+int	clk_hse_off		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_HSE,
@@ -282,7 +254,7 @@ static	int	clk_hse_off		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 #endif
-static	int	clk_hsi_set		(void)
+int	clk_hsi_set		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_HSI,
@@ -294,7 +266,7 @@ static	int	clk_hsi_set		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
-static	int	clk_hsi_off		(void)
+int	clk_hsi_off		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_HSI,
@@ -306,7 +278,7 @@ static	int	clk_hsi_off		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 #if 0
-static	int	clk_lse_set		(void)
+int	clk_lse_set		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_LSE,
@@ -317,7 +289,7 @@ static	int	clk_lse_set		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
-static	int	clk_lse_off		(void)
+int	clk_lse_off		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_LSE,
@@ -328,7 +300,7 @@ static	int	clk_lse_off		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
-static	int	clk_lsi_set		(void)
+int	clk_lsi_set		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_LSI,
@@ -340,7 +312,7 @@ static	int	clk_lsi_set		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
-static	int	clk_lsi_off		(void)
+int	clk_lsi_off		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_LSI,
@@ -351,7 +323,7 @@ static	int	clk_lsi_off		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 #endif
-static	int	clk_msi_set		(void)
+int	clk_msi_set		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_MSI,
@@ -364,7 +336,7 @@ static	int	clk_msi_set		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
-static	int	clk_msi_off		(void)
+int	clk_msi_off		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_MSI,
@@ -375,7 +347,7 @@ static	int	clk_msi_off		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
-static	int	clk_pll_set_from_hsi	(void)
+int	clk_pll_set_from_hsi	(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_HSI,
@@ -395,7 +367,7 @@ static	int	clk_pll_set_from_hsi	(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
-static	int	clk_pll_set_from_msi	(void)
+int	clk_pll_set_from_msi	(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.OscillatorType		= RCC_OSCILLATORTYPE_MSI,
@@ -416,7 +388,7 @@ static	int	clk_pll_set_from_msi	(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
-static	int	clk_pll_off		(void)
+int	clk_pll_off		(void)
 {
 	RCC_OscInitTypeDef	osc = {
 		.PLL.PLLState		= RCC_PLL_OFF
@@ -425,7 +397,7 @@ static	int	clk_pll_off		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 #if 0
-static	int	clk_sysclk_set_from_hse	(void)
+int	clk_sysclk_set_from_hse	(void)
 {
 	RCC_ClkInitTypeDef	clk = {
 		.ClockType		= RCC_CLOCKTYPE_SYSCLK |
@@ -441,7 +413,7 @@ static	int	clk_sysclk_set_from_hse	(void)
 	return	HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_0);
 }
 #endif
-static	int	clk_sysclk_set_from_hsi	(void)
+int	clk_sysclk_set_from_hsi	(void)
 {
 	RCC_ClkInitTypeDef	clk = {
 		.ClockType		= RCC_CLOCKTYPE_SYSCLK |
@@ -457,7 +429,7 @@ static	int	clk_sysclk_set_from_hsi	(void)
 	return	HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_0);
 }
 
-static	int	clk_sysclk_set_from_msi	(void)
+int	clk_sysclk_set_from_msi	(void)
 {
 	RCC_ClkInitTypeDef	clk = {
 		.ClockType		= RCC_CLOCKTYPE_SYSCLK |
@@ -473,7 +445,7 @@ static	int	clk_sysclk_set_from_msi	(void)
 	return	HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_0);
 }
 
-static	int	clk_sysclk_set_from_pll	(void)
+int	clk_sysclk_set_from_pll	(void)
 {
 	RCC_ClkInitTypeDef	clk = {
 		.ClockType		= (RCC_CLOCKTYPE_SYSCLK |
@@ -488,6 +460,11 @@ static	int	clk_sysclk_set_from_pll	(void)
 
 	return	HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_4);
 }
+
+
+/******************************************************************************
+ ******* static functions (definitions) ***************************************
+ ******************************************************************************/
 
 
 /******************************************************************************
