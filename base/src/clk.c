@@ -54,41 +54,200 @@
 /******************************************************************************
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
-static	int	clk_set_pll_from_msi	(void);
-static	int	clk_sysclk_set_pll	(void);
+#if 0
+static	int	clk_hse_set		(void);
+static	int	clk_hse_off		(void);
+#endif
+static	int	clk_hsi_set		(void);
+static	int	clk_hsi_off		(void);
+#if 0
+static	int	clk_lse_set		(void);
+static	int	clk_lse_off		(void);
+static	int	clk_lsi_set		(void);
+static	int	clk_lsi_off		(void);
+#endif
+static	int	clk_msi_set		(void);
+static	int	clk_msi_off		(void);
+static	int	clk_pll_set_from_hsi	(void);
+static	int	clk_pll_set_from_msi	(void);
+static	int	clk_pll_off		(void);
+#if 0
+static	int	clk_sysclk_set_from_hse	(void);
+#endif
+static	int	clk_sysclk_set_from_hsi	(void);
+static	int	clk_sysclk_set_from_msi	(void);
+static	int	clk_sysclk_set_from_pll	(void);
 
 
 /******************************************************************************
  ******* global functions *****************************************************
  ******************************************************************************/
+#if 0
 	/**
-	 * @brief	System Clock Configuration
-	 *		The system Clock is configured as follows
-	 *			System Clock source            = PLL (MSI)
-	 *			SYSCLK(Hz)                     = 80000000
-	 *			HCLK(Hz)                       = 80000000
-	 *			AHB Prescaler                  = 1
-	 *			APB1 Prescaler                 = 1
-	 *			APB2 Prescaler                 = 1
-	 *			MSI Frequency(Hz)              = 4000000
-	 *			PLL_M                          = 1
-	 *			PLL_N                          = 40
-	 *			PLL_R                          = 2
-	 *			PLL_P                          = 7
-	 *			PLL_Q                          = 4
-	 *			Flash Latency(WS)              = 4
+	 * @brief	System Clock Configuration (from HSE)
 	 * @note	Sets global variable 'prj_error'
 	 */
-void	sysclk_config	(void)
+void	sysclk_config_hse	(void)
 {
-	if (clk_set_pll_from_msi()) {
-		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+
+	if (clk_sysclk_set_from_msi()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
 		while(true) {
 			__NOP();
 		}
 	}
 
-	if (clk_sysclk_set_pll()) {
+	if (clk_hse_off()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_hse_set()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_sysclk_set_from_hse()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+}
+#endif
+	/**
+	 * @brief	System Clock Configuration (from MSI)
+	 * @note	Sets global variable 'prj_error'
+	 */
+void	sysclk_config_hsi	(void)
+{
+
+	if (clk_sysclk_set_from_msi()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+
+	if (clk_hsi_off()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_hsi_set()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_sysclk_set_from_hsi()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+}
+
+	/**
+	 * @brief	System Clock Configuration (from MSI)
+	 * @note	Sets global variable 'prj_error'
+	 */
+void	sysclk_config_msi	(void)
+{
+
+	sysclk_config_hsi();
+
+	if (clk_msi_off()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_msi_set()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_sysclk_set_from_msi()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+}
+
+	/**
+	 * @brief	System Clock Configuration (from PLL from HSI)
+	 * @note	Sets global variable 'prj_error'
+	 */
+void	sysclk_config_pll_hsi	(void)
+{
+
+	if (clk_sysclk_set_from_msi()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+
+	if (clk_pll_off()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_hsi_off()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_pll_set_from_hsi()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_sysclk_set_from_pll()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+}
+
+	/**
+	 * @brief	System Clock Configuration (from PLL from MSI)
+	 * @note	Sets global variable 'prj_error'
+	 */
+void	sysclk_config_pll_msi	(void)
+{
+
+	sysclk_config_hsi();
+
+	if (clk_pll_off()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_msi_off()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_pll_set_from_msi()) {
+		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
+		while(true) {
+			__NOP();
+		}
+	}
+	if (clk_sysclk_set_from_pll()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
 		while(true) {
 			__NOP();
@@ -100,44 +259,234 @@ void	sysclk_config	(void)
 /******************************************************************************
  ******* static functions (definitions) ***************************************
  ******************************************************************************/
-	/*
-	 * MSI is enabled after System reset, activate PLL with MSI as source
-	 */
-static	int	clk_set_pll_from_msi	(void)
+#if 0
+static	int	clk_hse_set		(void)
 {
-	RCC_OscInitTypeDef	rcc_osc;
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_HSE,
+		.HSEState		= RCC_HSE_ON,
+		.PLL.PLLState		= RCC_PLL_NONE
+	};
 
-	rcc_osc.OscillatorType		= RCC_OSCILLATORTYPE_MSI;
-	rcc_osc.MSIState		= RCC_MSI_ON;
-	rcc_osc.MSIClockRange		= RCC_MSIRANGE_6;
-	rcc_osc.MSICalibrationValue	= RCC_MSICALIBRATION_DEFAULT;
-	rcc_osc.PLL.PLLState		= RCC_PLL_ON;
-	rcc_osc.PLL.PLLSource		= RCC_PLLSOURCE_MSI;
-	rcc_osc.PLL.PLLM		= 1u;
-	rcc_osc.PLL.PLLN		= 40u;
-	rcc_osc.PLL.PLLP		= RCC_PLLP_DIV7;
-	rcc_osc.PLL.PLLQ		= RCC_PLLQ_DIV4;
-	rcc_osc.PLL.PLLR		= RCC_PLLR_DIV2;
-
-	return	HAL_RCC_OscConfig(&rcc_osc);
+	return	HAL_RCC_OscConfig(&osc);
 }
 
-	/*
-	 * Select PLL as system clock source and configure the HCLK, PCLK1
-	 * and PCLK2 clocks dividers
-	 */
-static	int	clk_sysclk_set_pll	(void)
+static	int	clk_hse_off		(void)
 {
-	RCC_ClkInitTypeDef	rcc_clk;
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_HSE,
+		.HSEState		= RCC_HSE_OFF,
+		.PLL.PLLState		= RCC_PLL_NONE,
+	};
 
-	rcc_clk.ClockType	= (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK |
-				RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
-	rcc_clk.SYSCLKSource	= RCC_SYSCLKSOURCE_PLLCLK;
-	rcc_clk.AHBCLKDivider	= RCC_SYSCLK_DIV1;
-	rcc_clk.APB1CLKDivider	= RCC_HCLK_DIV1;
-	rcc_clk.APB2CLKDivider	= RCC_HCLK_DIV1;
+	return	HAL_RCC_OscConfig(&osc);
+}
+#endif
+static	int	clk_hsi_set		(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_HSI,
+		.HSIState		= RCC_HSI_ON,
+		.HSICalibrationValue	= RCC_HSICALIBRATION_DEFAULT,
+		.PLL.PLLState		= RCC_PLL_NONE
+	};
 
-	return	HAL_RCC_ClockConfig(&rcc_clk, FLASH_LATENCY_4);
+	return	HAL_RCC_OscConfig(&osc);
+}
+
+static	int	clk_hsi_off		(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_HSI,
+		.HSIState		= RCC_HSI_OFF,
+		.HSICalibrationValue	= RCC_HSICALIBRATION_DEFAULT,
+		.PLL.PLLState		= RCC_PLL_NONE
+	};
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+#if 0
+static	int	clk_lse_set		(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_LSE,
+		.LSEState		= RCC_LSE_ON,
+		.PLL.PLLState		= RCC_PLL_NONE
+	};
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+
+static	int	clk_lse_off		(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_LSE,
+		.LSEState		= RCC_LSE_OFF,
+		.PLL.PLLState		= RCC_PLL_NONE
+	};
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+
+static	int	clk_lsi_set		(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_LSI,
+		.LSIState		= RCC_LSI_ON,
+		.LSIDiv			= RCC_LSI_DIV1,
+		.PLL.PLLState		= RCC_PLL_NONE
+	};
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+
+static	int	clk_lsi_off		(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_LSI,
+		.LSIState		= RCC_LSI_OFF,
+		.PLL.PLLState		= RCC_PLL_NONE
+	};
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+#endif
+static	int	clk_msi_set		(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_MSI,
+		.MSIState		= RCC_MSI_ON,
+		.MSICalibrationValue	= RCC_MSICALIBRATION_DEFAULT,
+		.MSIClockRange		= RCC_MSIRANGE_6,
+		.PLL.PLLState		= RCC_PLL_NONE
+	};
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+
+static	int	clk_msi_off		(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_MSI,
+		.MSIState		= RCC_MSI_OFF,
+		.PLL.PLLState		= RCC_PLL_NONE
+	};
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+
+static	int	clk_pll_set_from_hsi	(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_HSI,
+		.HSIState		= RCC_HSI_ON,
+		.HSICalibrationValue	= RCC_HSICALIBRATION_DEFAULT,
+		.PLL			= {
+			.PLLState		= RCC_PLL_ON,
+			.PLLSource		= RCC_PLLSOURCE_HSI,
+			.PLLM			= 2,
+			.PLLN			= 20,
+			.PLLP			= RCC_PLLP_DIV7,
+			.PLLQ			= RCC_PLLQ_DIV4,
+			.PLLR			= RCC_PLLR_DIV2
+		}
+	 };
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+
+static	int	clk_pll_set_from_msi	(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.OscillatorType		= RCC_OSCILLATORTYPE_MSI,
+		.MSIState		= RCC_MSI_ON,
+		.MSICalibrationValue	= RCC_MSICALIBRATION_DEFAULT,
+		.MSIClockRange		= RCC_MSIRANGE_6,
+		.PLL			= {
+			.PLLState		= RCC_PLL_ON,
+			.PLLSource		= RCC_PLLSOURCE_MSI,
+			.PLLM			= 1,
+			.PLLN			= 40,
+			.PLLP			= RCC_PLLP_DIV7,
+			.PLLQ			= RCC_PLLQ_DIV4,
+			.PLLR			= RCC_PLLR_DIV2
+		}
+	};
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+
+static	int	clk_pll_off		(void)
+{
+	RCC_OscInitTypeDef	osc = {
+		.PLL.PLLState		= RCC_PLL_OFF
+	};
+
+	return	HAL_RCC_OscConfig(&osc);
+}
+#if 0
+static	int	clk_sysclk_set_from_hse	(void)
+{
+	RCC_ClkInitTypeDef	clk = {
+		.ClockType		= RCC_CLOCKTYPE_SYSCLK |
+						RCC_CLOCKTYPE_HCLK |
+						RCC_CLOCKTYPE_PCLK1 |
+						RCC_CLOCKTYPE_PCLK2,
+		.SYSCLKSource		= RCC_SYSCLKSOURCE_HSE,
+		.AHBCLKDivider		= RCC_SYSCLK_DIV1,
+		.APB1CLKDivider		= RCC_HCLK_DIV1,
+		.APB2CLKDivider		= RCC_HCLK_DIV1
+	};
+
+	return	HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_0);
+}
+#endif
+static	int	clk_sysclk_set_from_hsi	(void)
+{
+	RCC_ClkInitTypeDef	clk = {
+		.ClockType		= RCC_CLOCKTYPE_SYSCLK |
+						RCC_CLOCKTYPE_HCLK |
+						RCC_CLOCKTYPE_PCLK1 |
+						RCC_CLOCKTYPE_PCLK2,
+		.SYSCLKSource		= RCC_SYSCLKSOURCE_HSI,
+		.AHBCLKDivider		= RCC_SYSCLK_DIV1,
+		.APB1CLKDivider		= RCC_HCLK_DIV1,
+		.APB2CLKDivider		= RCC_HCLK_DIV1
+	};
+
+	return	HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_0);
+}
+
+static	int	clk_sysclk_set_from_msi	(void)
+{
+	RCC_ClkInitTypeDef	clk = {
+		.ClockType		= RCC_CLOCKTYPE_SYSCLK |
+						RCC_CLOCKTYPE_HCLK |
+						RCC_CLOCKTYPE_PCLK1 |
+						RCC_CLOCKTYPE_PCLK2,
+		.SYSCLKSource		= RCC_SYSCLKSOURCE_MSI,
+		.AHBCLKDivider		= RCC_SYSCLK_DIV1,
+		.APB1CLKDivider		= RCC_HCLK_DIV1,
+		.APB2CLKDivider		= RCC_HCLK_DIV1
+	};
+
+	return	HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_0);
+}
+
+static	int	clk_sysclk_set_from_pll	(void)
+{
+	RCC_ClkInitTypeDef	clk = {
+		.ClockType		= (RCC_CLOCKTYPE_SYSCLK |
+						RCC_CLOCKTYPE_HCLK |
+						RCC_CLOCKTYPE_PCLK1 |
+						RCC_CLOCKTYPE_PCLK2),
+		.SYSCLKSource		= RCC_SYSCLKSOURCE_PLLCLK,
+		.AHBCLKDivider		= RCC_SYSCLK_DIV1,
+		.APB1CLKDivider		= RCC_HCLK_DIV1,
+		.APB2CLKDivider		= RCC_HCLK_DIV1
+	};
+
+	return	HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_4);
 }
 
 

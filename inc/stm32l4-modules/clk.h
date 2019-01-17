@@ -51,7 +51,13 @@
 /******************************************************************************
  ******* functions ************************************************************
  ******************************************************************************/
-void	sysclk_config	(void);
+#if 0
+void	sysclk_config_hse	(void);
+#endif
+void	sysclk_config_hsi	(void);
+void	sysclk_config_msi	(void);
+void	sysclk_config_pll_hsi	(void);
+void	sysclk_config_pll_msi	(void);
 
 
 /******************************************************************************
