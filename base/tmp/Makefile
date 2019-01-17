@@ -12,7 +12,7 @@ SRC_DIR = $(STM32L4_MODULES_DIR)/base/src/
 
 # dependencies
 
-ALL	= button.o can.o clk.o delay.o errors.o i2c.o led.o pwm.o spi.o tim.o
+ALL	= button.o can.o clk.o delay.o delay_it.o errors.o i2c.o led.o pwm.o spi.o tim.o
 
 COMMON_INC_CMSIS	= core_cm4.h cmsis_gcc.h
 COMMON_INC_CMSIS_L4	= stm32l4xx.h
@@ -60,6 +60,16 @@ DELAY_DEPS		= $(SRC_DIR)/delay.c \
 			$(COMMON_DEPS) \
 			$(patsubst %,$(INC_DIR)/%,$(DELAY_INC))
 DELAY_INC_DIRS		= -I $(INC_DIR) \
+			$(COMMON_INC_DIRS)
+
+
+DEL_IT_INC		= stm32l4-modules/delay_it.h \
+				stm32l4-modules/tim.h \
+				stm32l4-modules/errors.h
+DEL_IT_DEPS		= $(SRC_DIR)/delay_it.c \
+			$(COMMON_DEPS) \
+			$(patsubst %,$(INC_DIR)/%,$(DEL_IT_INC))
+DEL_IT_INC_DIRS		= -I $(INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
@@ -150,6 +160,13 @@ delay.s: $(DELAY_DEPS)
 	@echo	"	CC	$@"
 	$(Q)$(CC) $(CFLAGS) $(DELAY_INC_DIRS) -S $< -o $@
 delay.o: delay.s
+	@echo	"	AS	$@"
+	$(Q)$(AS) $< -o $@
+
+delay_it.s: $(DEL_IT_DEPS)
+	@echo	"	CC	$@"
+	$(Q)$(CC) $(CFLAGS) $(DEL_IT_INC_DIRS) -S $< -o $@
+delay_it.o: delay_it.s
 	@echo	"	AS	$@"
 	$(Q)$(AS) $< -o $@
 
