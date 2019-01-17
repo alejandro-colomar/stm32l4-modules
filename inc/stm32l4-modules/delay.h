@@ -56,6 +56,10 @@ int	delay_us_init	(void);
 int	delay_us_deinit	(void);
 int	delay_us	(uint32_t time_us);
 
+int	delay_ms_init	(void);
+int	delay_ms_deinit	(void);
+int	delay_ms	(uint32_t time_ms);
+
 
 /******************************************************************************
  ******* include guard ********************************************************
