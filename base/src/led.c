@@ -147,13 +147,14 @@ void	led_toggle	(void)
  ******************************************************************************/
 static	void	led_gpio_init	(void)
 {
-	GPIO_InitTypeDef	gpio;
+	GPIO_InitTypeDef	gpio	= {
+		.Pin	= LED_G_GPIO_PIN,
+		.Mode	= LED_G_GPIO_MODE,
+		.Speed	= LED_G_GPIO_SPEED,
+		.Pull	= LED_G_GPIO_PULL
+	};
 
 	LED_G_GPIO_CLK_ENABLE();
-	gpio.Pin	= LED_G_GPIO_PIN;
-	gpio.Mode	= LED_G_GPIO_MODE;
-	gpio.Speed	= LED_G_GPIO_SPEED;
-	gpio.Pull	= LED_G_GPIO_PULL;
 	HAL_GPIO_Init(LED_G_GPIO_PORT, &gpio);
 }
 

@@ -83,15 +83,19 @@ int	servo_test_1	(void)
 {
 	int	i;
 
+	if (delay_ms_init()) {
+		return	ERROR_OK;
+	}
+
 	if (servo_init()) {
 		return	ERROR_NOK;
 	}
 
 	for (i = 00; i <= 90; i+=10) {
 		led_set();
-		delay_us(100000u);
+		delay_ms(500u);
 		led_reset();
-		delay_us(100000u);
+		delay_ms(500u);
 
 		if (servo_test_position(-i)) {
 			return	ERROR_NOK;
@@ -110,6 +114,10 @@ int	servo_test_1	(void)
 		}
 	}
 
+	if (delay_ms_deinit()) {
+		return	ERROR_NOK;
+	}
+
 	return	ERROR_OK;
 }
 
@@ -121,15 +129,19 @@ int	servo_test_2	(void)
 {
 	int	i;
 
+	if (delay_ms_init()) {
+		return	ERROR_OK;
+	}
+
 	if (servo_init()) {
 		return	ERROR_NOK;
 	}
 
 	for (i = -90; i <= 90; i+=10) {
 		led_set();
-		delay_us(100000u);
+		delay_ms(100u);
 		led_reset();
-		delay_us(100000u);
+		delay_ms(100u);
 
 		if (servo_test_position(i)) {
 			return	ERROR_NOK;
@@ -138,13 +150,17 @@ int	servo_test_2	(void)
 
 	for (i = 90; i >= -90; i-=10) {
 		led_set();
-		delay_us(200000u);
+		delay_ms(200u);
 		led_reset();
-		delay_us(200000u);
+		delay_ms(200u);
 
 		if (servo_test_position(i)) {
 			return	ERROR_NOK;
 		}
+	}
+
+	if (delay_ms_deinit()) {
+		return	ERROR_NOK;
 	}
 
 	return	ERROR_OK;
@@ -169,7 +185,7 @@ static	int	servo_test_position	(float pos)
 		return	ERROR_NOK;
 	}
 
-	if (delay_us(1000000u)) {
+	if (delay_ms(1000u)) {
 		return	ERROR_NOK;
 	}
 

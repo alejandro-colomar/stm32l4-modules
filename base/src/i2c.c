@@ -330,19 +330,23 @@ static	void	i2c_gpio_init		(void)
 	GPIO_InitTypeDef	gpio;
 
 	I2Cx_SCL_GPIO_CLK_ENABLE();
-	gpio.Pin	= I2Cx_SCL_GPIO_PIN;
-	gpio.Mode	= I2Cx_SCL_GPIO_MODE;
-	gpio.Pull	= I2Cx_SCL_GPIO_PULL;
-	gpio.Speed	= I2Cx_SCL_GPIO_SPEED;
-	gpio.Alternate	= I2Cx_SCL_GPIO_ALT;
+	gpio	= (GPIO_InitTypeDef){
+		.Pin		= I2Cx_SCL_GPIO_PIN,
+		.Mode		= I2Cx_SCL_GPIO_MODE,
+		.Pull		= I2Cx_SCL_GPIO_PULL,
+		.Speed		= I2Cx_SCL_GPIO_SPEED,
+		.Alternate	= I2Cx_SCL_GPIO_ALT
+	};
 	HAL_GPIO_Init(I2Cx_SCL_GPIO_PORT, &gpio);
 
 	I2Cx_SDA_GPIO_CLK_ENABLE();
-	gpio.Pin	= I2Cx_SDA_GPIO_PIN;
-	gpio.Mode	= I2Cx_SCL_GPIO_MODE;
-	gpio.Pull	= I2Cx_SDA_GPIO_PULL;
-	gpio.Speed	= I2Cx_SDA_GPIO_SPEED;
-	gpio.Alternate	= I2Cx_SDA_GPIO_ALT;
+	gpio	= (GPIO_InitTypeDef){
+		.Pin		= I2Cx_SDA_GPIO_PIN,
+		.Mode		= I2Cx_SDA_GPIO_MODE,
+		.Pull		= I2Cx_SDA_GPIO_PULL,
+		.Speed		= I2Cx_SDA_GPIO_SPEED,
+		.Alternate	= I2Cx_SDA_GPIO_ALT
+	};
 	HAL_GPIO_Init(I2Cx_SDA_GPIO_PORT, &gpio);
 }
 
@@ -369,14 +373,18 @@ static	void	i2c_nvic_deconf		(void)
 static	int	i2c_peripherial_init	(void)
 {
 
-	i2c.Instance		= I2Cx_INSTANCE;
-	i2c.Init.Timing			= I2Cx_INIT_TIMING;
-	i2c.Init.OwnAddress1		= I2Cx_INIT_OWN_ADRESS_1;
-	i2c.Init.AddressingMode		= I2Cx_INIT_ADDRESSING_MODE;
-	i2c.Init.DualAddressMode	= I2Cx_INIT_DUAL_ADDRESS_MODE;
-	i2c.Init.OwnAddress2		= I2Cx_INIT_OWN_ADRESS_2;
-	i2c.Init.GeneralCallMode	= I2Cx_INIT_GENERAL_CALL_MODE;
-	i2c.Init.NoStretchMode		= I2Cx_INIT_NO_STRETCH_MODE;
+	i2c	= (I2C_HandleTypeDef){
+		.Instance		= I2Cx_INSTANCE,
+		.Init	= {
+			.Timing			= I2Cx_INIT_TIMING,
+			.OwnAddress1		= I2Cx_INIT_OWN_ADRESS_1,
+			.AddressingMode		= I2Cx_INIT_ADDRESSING_MODE,
+			.DualAddressMode	= I2Cx_INIT_DUAL_ADDRESS_MODE,
+			.OwnAddress2		= I2Cx_INIT_OWN_ADRESS_2,
+			.GeneralCallMode	= I2Cx_INIT_GENERAL_CALL_MODE,
+			.NoStretchMode		= I2Cx_INIT_NO_STRETCH_MODE
+		}
+	};
 
 	return	HAL_I2C_Init(&i2c);
 }

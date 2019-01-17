@@ -54,6 +54,7 @@ DISPLAY_INC_DIRS	= -I $(INC_DIR) \
 
 LED_INC			= stm32l4-modules/test/led_test.h \
 				stm32l4-modules/delay.h \
+				stm32l4-modules/delay_it.h \
 				stm32l4-modules/errors.h \
 				stm32l4-modules/led.h
 LED_DEPS		= $(SRC_DIR)/led_test.c \

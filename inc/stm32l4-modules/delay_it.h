@@ -1,31 +1,28 @@
 /******************************************************************************
- *	Copyright (C) 2018	Colomar Andrés, Alejandro		      *
- *	Copyright (C) 2018	García Pedroche, Francisco Javier	      *
- *	Copyright (C) 2018	Junquera Carrero, Santiago		      *
+ *	Copyright (C) 2019	Colomar Andrés, Alejandro		      *
  *	SPDX-License-Identifier:	LGPL-2.0-only			      *
  ******************************************************************************/
 
 /**
- *	@file		clk.h
+ *	@file		delay_it.h
  *	@author		Colomar Andrés, Alejandro
- *	@author		García Pedroche, Francisco Javier
- *	@author		Junquera Carrero, Santiago
  *	@copyright	LGPL-2.0-only
- *	@date		2018/dec/15
- *	@brief		CLK
+ *	@date		2019/jan/17
+ *	@brief		delay_it
  */
 
 
 /******************************************************************************
  ******* include guard ********************************************************
  ******************************************************************************/
-# ifndef		STM32L4_MODULES_CLK_H
-	# define	STM32L4_MODULES_CLK_H
+#ifndef STM32L4_MODULES_DELAY_IT_H
+	#define STM32L4_MODULES_DELAY_IT_H
 
 
 /******************************************************************************
  ******* headers **************************************************************
  ******************************************************************************/
+	#include <stdint.h>
 
 
 /******************************************************************************
@@ -51,43 +48,15 @@
 /******************************************************************************
  ******* functions ************************************************************
  ******************************************************************************/
-#if 0
-void	sysclk_config_hse	(void);
-#endif
-void	sysclk_config_hsi	(void);
-void	sysclk_config_msi	(void);
-void	sysclk_config_pll_hsi	(void);
-void	sysclk_config_pll_msi	(void);
-
-#if 0
-int	clk_hse_set		(void);
-int	clk_hse_off		(void);
-#endif
-int	clk_hsi_set		(void);
-int	clk_hsi_off		(void);
-#if 0
-int	clk_lse_set		(void);
-int	clk_lse_off		(void);
-int	clk_lsi_set		(void);
-int	clk_lsi_off		(void);
-#endif
-int	clk_msi_set		(void);
-int	clk_msi_off		(void);
-int	clk_pll_set_from_hsi	(void);
-int	clk_pll_set_from_msi	(void);
-int	clk_pll_off		(void);
-#if 0
-int	clk_sysclk_set_from_hse	(void);
-#endif
-int	clk_sysclk_set_from_hsi	(void);
-int	clk_sysclk_set_from_msi	(void);
-int	clk_sysclk_set_from_pll	(void);
+int	delay_it_ms_init	(void);
+int	delay_it_ms_deinit	(void);
+int	delay_it_ms		(uint32_t time_ms);
 
 
 /******************************************************************************
  ******* include guard ********************************************************
  ******************************************************************************/
-# endif			/* clk.h */
+#endif	/* delay.h */
 
 
 /******************************************************************************

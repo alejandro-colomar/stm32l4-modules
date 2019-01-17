@@ -1,17 +1,16 @@
 /******************************************************************************
- *	Copyright (C) 2018	Colomar Andrés, Alejandro		      *
- *	Copyright (C) 2018	García Pedroche, Francisco Javier	      *
+ *	Copyright (C) 2019	Colomar Andrés, Alejandro		      *
  *	SPDX-License-Identifier:	LGPL-2.0-only			      *
  ******************************************************************************/
 
 /**
- *	@file		tim.c
+ *	@file		delay_it.c
  *	@author		Colomar Andrés, Alejandro
- *	@author		García Pedroche, Francisco Javier
  *	@copyright	LGPL-2.0-only
- *	@date		2018/dec/25
- *	@brief		timer
+ *	@date		2019/jan/17
+ *	@brief		delay_it
  */
+
 
 /******************************************************************************
  ******* headers **************************************************************
@@ -23,23 +22,25 @@
 
 	#include "stm32l4-modules/errors.h"
 	#include "stm32l4-modules/led.h"
-
 	#include "stm32l4-modules/tim.h"
+
+	#include "stm32l4-modules/delay_it.h"
 
 
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-#define RESOLUTION_1_US		(1000000u)
+#define RESOLUTION_100_US	(10000u)
+#define RESOLUTION_1_MS		(1000u)
 
-#define TIMx_INSTANCE		(TIM3)
-#define TIMx_CLK_ENABLE()	__HAL_RCC_TIM3_CLK_ENABLE()
-#define TIMx_CLK_DISABLE()	__HAL_RCC_TIM3_CLK_DISABLE()
+#define TIMx_INSTANCE		(TIM4)
+#define TIMx_CLK_ENABLE()	__HAL_RCC_TIM4_CLK_ENABLE()
+#define TIMx_CLK_DISABLE()	__HAL_RCC_TIM4_CLK_DISABLE()
 
-#define TIMx_IRQHandler		TIM3_IRQHandler
-#define TIMx_IRQn		(TIM3_IRQn)
+#define TIMx_IRQHandler		TIM4_IRQHandler
+#define TIMx_IRQn		(TIM4_IRQn)
 #define TIMx_PREEMPT_PRIORITY	(2)
-#define TIMx_SUB_PRIORITY	(2)
+#define TIMx_SUB_PRIORITY	(3)
 
 
 /******************************************************************************
@@ -56,9 +57,7 @@
  ******* variables ************************************************************
  ******************************************************************************/
 /* Volatile ------------------------------------------------------------------*/
-	volatile bool	tim_tim3_interrupt;
-	volatile bool	tim_tim4_interrupt;
-	volatile bool	*const tim_it_timx_interrupt_ptr = &tim_tim3_interrupt;
+static	volatile bool	*const delay_it_timx_interrupt_ptr = &tim_tim4_interrupt;
 /* Global --------------------------------------------------------------------*/
 /* Static --------------------------------------------------------------------*/
 static	bool			init_pending	= true;
@@ -68,22 +67,23 @@ static	TIM_HandleTypeDef	tim;
 /******************************************************************************
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
-static	void	tim_it_nvic_conf	(void);
-static	void	tim_it_nvic_deconf	(void);
-static	int	tim_it_tim_init		(uint16_t period_ms);
-static	int	tim_it_tim_deinit	(void);
+static	int	delay_it_tim_init	(void);
+static	void	delay_it_delay_init	(uint32_t time_ms, uint32_t *overflows);
+static	void	delay_it_delay_loop	(uint32_t overflows);
+static	int	delay_it_tim_deinit	(void);
+static	void	delay_it_nvic_conf	(void);
+static	void	delay_it_nvic_deconf	(void);
 
 
 /******************************************************************************
  ******* global functions *****************************************************
  ******************************************************************************/
 	/**
-	 * @brief	Initialize periodic interrupts using TIMx
-	 * @param	period_us:	period of interrupts in us
+	 * @brief	Initialize base time for delay_it_ms()
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	tim_it_init		(uint16_t period_us)
+int	delay_it_ms_init	(void)
 {
 
 	if (init_pending) {
@@ -92,32 +92,19 @@ int	tim_it_init		(uint16_t period_us)
 		return	ERROR_OK;
 	}
 
-	*tim_it_timx_interrupt_ptr	= false;
-
 	TIMx_CLK_ENABLE();
-	tim_it_nvic_conf();
-	if (tim_it_tim_init(period_us)) {
-		prj_error	|= ERROR_TIM_HAL_TIM_INIT;
+	delay_it_nvic_conf();
+	if (delay_it_tim_init()) {
+		prj_error	|= ERROR_DELAY_HAL_TIM_INIT;
 		prj_error_handle();
 		goto err_init;
-	}
-	if (HAL_TIM_Base_Start_IT(&tim)) {
-		prj_error	|= ERROR_TIM_HAL_TIM_START_IT;
-		prj_error_handle();
-		goto err_start;
 	}
 
 	return	ERROR_OK;
 
 
-err_start:
-	if (tim_it_tim_deinit()) {
-		prj_error	|= ERROR_TIM_HAL_TIM_DEINIT;
-		prj_error_handle();
-	}
-
 err_init:
-	tim_it_nvic_deconf();
+	delay_it_nvic_deconf();
 	TIMx_CLK_DISABLE();
 	init_pending	= true;
 
@@ -125,11 +112,11 @@ err_init:
 }
 
 	/**
-	 * @brief	Deinitialize periodic interrupts using TIMx
-	 *		Sets global variable 'error'
+	 * @brief	Deinitialize base time for delay_it_ms()
 	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
 	 */
-int	tim_it_deinit		(void)
+int	delay_it_ms_deinit	(void)
 {
 	int	status;
 
@@ -141,20 +128,57 @@ int	tim_it_deinit		(void)
 		return	status;
 	}
 
-	if (HAL_TIM_Base_Stop_IT(&tim)) {
-		prj_error	|= ERROR_TIM_HAL_TIM_STOP_IT;
+	if (delay_it_tim_deinit()) {
+		prj_error	|= ERROR_DELAY_HAL_TIM_DEINIT;
 		prj_error_handle();
 		status	= ERROR_NOK;
 	}
-	if (tim_it_tim_deinit()) {
-		prj_error	|= ERROR_TIM_HAL_TIM_DEINIT;
-		prj_error_handle();
-		status	= ERROR_NOK;
-	}
-	tim_it_nvic_deconf();
+	delay_it_nvic_deconf();
 	TIMx_CLK_DISABLE();
 
 	return	status;
+}
+
+	/**
+	 * @brief	Delay <time_ms> microseconds
+	 * @param	time_ms:	Delay value (ms)
+	 * 			This value should not exceed (UINT32_MAX / 10)
+	 * @return	Error
+	 * @note	Sets global variable 'prj_error'
+	 */
+int	delay_it_ms		(uint32_t time_ms)
+{
+	uint32_t	overflows;
+
+	if (init_pending) {
+		if (delay_it_ms_init()) {
+			prj_error	|= ERROR_DELAY_INIT;
+			prj_error_handle();
+			return	ERROR_NOK;
+		}
+	}
+
+	if (!time_ms) {
+		return	ERROR_OK;
+	}
+
+	delay_it_delay_init(time_ms, &overflows);
+
+	if (HAL_TIM_Base_Start(&tim)) {
+		prj_error	|= ERROR_DELAY_HAL_TIM_START;
+		prj_error_handle();
+		return	ERROR_NOK;
+	}
+
+	delay_it_delay_loop(overflows);
+
+	if (HAL_TIM_Base_Stop(&tim)) {
+		prj_error	|= ERROR_DELAY_HAL_TIM_STOP;
+		prj_error_handle();
+		return	ERROR_NOK;
+	}
+
+	return	ERROR_OK;
 }
 
 
@@ -170,25 +194,66 @@ void	TIMx_IRQHandler			(void)
 	HAL_TIM_IRQHandler(&tim);
 }
 
-	/**
-	 * @brief	TIM callback
-	 * @param	tim_ptr:	pointer to a TIM_HandleTypeDef structure
-	 */
-void	HAL_TIM_PeriodElapsedCallback	(TIM_HandleTypeDef *tim_ptr)
-{
-
-	if (tim_ptr->Instance == TIM3) {
-		tim_tim3_interrupt	= true;
-	} else if (tim_ptr->Instance == TIM4) {
-		tim_tim4_interrupt	= true;
-	}
-}
-
 
 /******************************************************************************
  ******* static functions (definitions) ***************************************
  ******************************************************************************/
-static	void	tim_it_nvic_conf	(void)
+static	int	delay_it_tim_init	(void)
+{
+
+	tim	= (TIM_HandleTypeDef){
+		.Instance	= TIMx_INSTANCE,
+		.Init		= {
+			.Prescaler		= ((SystemCoreClock /
+							RESOLUTION_100_US) - 1u),
+			.CounterMode		= TIM_COUNTERMODE_UP,
+			.Period			= UINT16_MAX,
+			.ClockDivision		= TIM_CLOCKDIVISION_DIV1,
+			.RepetitionCounter	= 0,
+			.AutoReloadPreload	= TIM_AUTORELOAD_PRELOAD_DISABLE
+		}
+	};
+
+	return	HAL_TIM_Base_Init(&tim);
+}
+
+static	void	delay_it_delay_init	(uint32_t time_ms, uint32_t *overflows)
+{
+	uint32_t	time_res;
+	uint32_t	counter_initial;
+	uint32_t	partial;
+
+	time_res	= time_ms * (RESOLUTION_100_US / RESOLUTION_1_MS);
+
+	*overflows	= (time_res / ((uint32_t)UINT16_MAX + 1u)) + 1u;
+	partial		= time_res % ((uint32_t)UINT16_MAX + 1u);
+	counter_initial	= (uint32_t)UINT16_MAX + 1u - partial;
+
+	__HAL_TIM_SET_COUNTER(&tim, counter_initial);
+}
+
+static	void	delay_it_delay_loop	(uint32_t overflows)
+{
+	uint32_t	counter_flags	= 0;
+
+	while (counter_flags < overflows) {
+		__WFI();
+
+		if (*delay_it_timx_interrupt_ptr) {
+			counter_flags++;
+
+			*delay_it_timx_interrupt_ptr	= false;
+		}
+	}
+}
+
+static	int	delay_it_tim_deinit	(void)
+{
+
+	return	HAL_TIM_Base_DeInit(&tim);
+}
+
+static	void	delay_it_nvic_conf		(void)
 {
 
 	HAL_NVIC_SetPriority(TIMx_IRQn, TIMx_PREEMPT_PRIORITY,
@@ -196,34 +261,10 @@ static	void	tim_it_nvic_conf	(void)
 	HAL_NVIC_EnableIRQ(TIMx_IRQn);
 }
 
-static	void	tim_it_nvic_deconf	(void)
+static	void	delay_it_nvic_deconf		(void)
 {
 
 	HAL_NVIC_DisableIRQ(TIMx_IRQn);
-}
-
-static	int	tim_it_tim_init	(uint16_t period_us)
-{
-
-	tim	= (TIM_HandleTypeDef){
-		.Instance	= TIMx_INSTANCE,
-		.Init		= {
-			.Prescaler		= ((SystemCoreClock /
-							RESOLUTION_1_US) - 1u),
-			.CounterMode		= TIM_COUNTERMODE_UP,
-			.Period			= (period_us - 1u),
-			.ClockDivision		= TIM_CLOCKDIVISION_DIV1,
-			.RepetitionCounter	= 0
-		}
-	};
-
-	return	HAL_TIM_Base_Init(&tim);
-}
-
-static	int	tim_it_tim_deinit	(void)
-{
-
-	return	HAL_TIM_Base_DeInit(&tim);
 }
 
 
