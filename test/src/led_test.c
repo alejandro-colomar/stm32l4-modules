@@ -22,6 +22,7 @@
 	#include "stm32l4xx_hal.h"
 
 	#include "stm32l4-modules/delay.h"
+	#include "stm32l4-modules/delay_it.h"
 	#include "stm32l4-modules/errors.h"
 	#include "stm32l4-modules/led.h"
 
@@ -62,7 +63,7 @@
 	 * @brief	Test LEDs
 	 * @return	Error
 	 */
-int	led_test	(void)
+int	led_test_1	(void)
 {
 	int		i;
 
@@ -80,6 +81,64 @@ int	led_test	(void)
 			return	ERROR_NOK;
 		}
 	}
+
+	delay_us_deinit();
+
+	return	ERROR_OK;
+}
+
+	/**
+	 * @brief	Test LEDs
+	 * @return	Error
+	 */
+int	led_test_2	(void)
+{
+	int		i;
+
+	delay_ms_init();
+	led_init();
+
+	for (i = 0; i <= 100; i++) {
+		led_set();
+		if (delay_ms(i)) {
+			return	ERROR_NOK;
+		}
+
+		led_reset();
+		if (delay_ms(i)) {
+			return	ERROR_NOK;
+		}
+	}
+
+	delay_ms_deinit();
+
+	return	ERROR_OK;
+}
+
+	/**
+	 * @brief	Test LEDs
+	 * @return	Error
+	 */
+int	led_test_3	(void)
+{
+	int		i;
+
+	delay_it_ms_init();
+	led_init();
+
+	for (i = 0; i <= 100; i++) {
+		led_set();
+		if (delay_it_ms(i)) {
+			return	ERROR_NOK;
+		}
+
+		led_reset();
+		if (delay_it_ms(i)) {
+			return	ERROR_NOK;
+		}
+	}
+
+	delay_it_ms_deinit();
 
 	return	ERROR_OK;
 }
