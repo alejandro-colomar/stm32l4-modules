@@ -52,12 +52,12 @@
  ******* functions ************************************************************
  ******************************************************************************/
 #if 0
-void	sysclk_config_hse	(void);
+int	sysclk_config_hse	(void);
 #endif
-void	sysclk_config_hsi	(void);
-void	sysclk_config_msi	(void);
-void	sysclk_config_pll_hsi	(void);
-void	sysclk_config_pll_msi	(void);
+int	sysclk_config_hsi	(void);
+int	sysclk_config_msi	(void);
+int	sysclk_config_pll_hsi	(void);
+int	sysclk_config_pll_msi	(void);
 
 #if 0
 int	clk_hse_set		(void);
@@ -76,6 +76,7 @@ int	clk_msi_off		(void);
 int	clk_pll_set_from_hsi	(void);
 int	clk_pll_set_from_msi	(void);
 int	clk_pll_off		(void);
+
 #if 0
 int	clk_sysclk_set_from_hse	(void);
 #endif

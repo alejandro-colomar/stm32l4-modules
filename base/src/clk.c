@@ -63,173 +63,148 @@
 	/**
 	 * @brief	System Clock Configuration (from HSE)
 	 * @note	Sets global variable 'prj_error'
+	 * @return	Error
 	 */
-void	sysclk_config_hse	(void)
+int	sysclk_config_hse	(void)
 {
 
 	if (clk_sysclk_set_from_msi()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 
 	if (clk_hse_off()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_hse_set()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_sysclk_set_from_hse()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
+
+	return	ERROR_OK;
 }
 #endif
 	/**
 	 * @brief	System Clock Configuration (from MSI)
 	 * @note	Sets global variable 'prj_error'
+	 * @return	Error
 	 */
-void	sysclk_config_hsi	(void)
+int	sysclk_config_hsi	(void)
 {
 
 	if (clk_sysclk_set_from_msi()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 
 	if (clk_hsi_off()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_hsi_set()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_sysclk_set_from_hsi()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
+
+	return	ERROR_OK;
 }
 
 	/**
 	 * @brief	System Clock Configuration (from MSI)
 	 * @note	Sets global variable 'prj_error'
+	 * @return	Error
 	 */
-void	sysclk_config_msi	(void)
+int	sysclk_config_msi	(void)
 {
 
 	sysclk_config_hsi();
 
 	if (clk_msi_off()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_msi_set()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_sysclk_set_from_msi()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
+
+	return	ERROR_OK;
 }
 
 	/**
 	 * @brief	System Clock Configuration (from PLL from HSI)
 	 * @note	Sets global variable 'prj_error'
+	 * @return	Error
 	 */
-void	sysclk_config_pll_hsi	(void)
+int	sysclk_config_pll_hsi	(void)
 {
 
 	if (clk_sysclk_set_from_msi()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 
 	if (clk_pll_off()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_hsi_off()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_pll_set_from_hsi()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_sysclk_set_from_pll()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
+
+	return	ERROR_OK;
 }
 
 	/**
 	 * @brief	System Clock Configuration (from PLL from MSI)
 	 * @note	Sets global variable 'prj_error'
+	 * @return	Error
 	 */
-void	sysclk_config_pll_msi	(void)
+int	sysclk_config_pll_msi	(void)
 {
 
 	sysclk_config_hsi();
 
 	if (clk_pll_off()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_msi_off()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_pll_set_from_msi()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_OSC_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
 	if (clk_sysclk_set_from_pll()) {
 		prj_error	|= ERROR_CLK_HAL_RCC_CLK_CONF;
-		while(true) {
-			__NOP();
-		}
+		return	ERROR_NOK;
 	}
+
+	return	ERROR_OK;
 }
 #if 0
 int	clk_hse_set		(void)
