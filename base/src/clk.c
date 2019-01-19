@@ -322,6 +322,14 @@ int	clk_msi_off		(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
+	/*
+	 *	VCO_in	= (HSI / M);
+	 *		4 MHz < VCO_in < 16 MHz
+	 *	VCO_out	= (VCO_in * N);
+	 *		64 MHz < VCO_out < 344 MHz
+	 *	PLL_out	= (VCO_out / (P, Q or R));
+	 *		PLL_out < 80 MHz
+	 */
 int	clk_pll_set_from_hsi	(void)
 {
 	RCC_OscInitTypeDef	osc = {
@@ -331,8 +339,8 @@ int	clk_pll_set_from_hsi	(void)
 		.PLL			= {
 			.PLLState		= RCC_PLL_ON,
 			.PLLSource		= RCC_PLLSOURCE_HSI,
-			.PLLM			= 2,
-			.PLLN			= 20,
+			.PLLM			= 1,
+			.PLLN			= 10,
 			.PLLP			= RCC_PLLP_DIV7,
 			.PLLQ			= RCC_PLLQ_DIV4,
 			.PLLR			= RCC_PLLR_DIV2
@@ -342,6 +350,14 @@ int	clk_pll_set_from_hsi	(void)
 	return	HAL_RCC_OscConfig(&osc);
 }
 
+	/*
+	 *	VCO_in	= (HSI / M);
+	 *		4 MHz < VCO_in < 16 MHz
+	 *	VCO_out	= (VCO_in * N);
+	 *		64 MHz < VCO_out < 344 MHz
+	 *	PLL_out	= (VCO_out / (P, Q or R));
+	 *		PLL_out < 80 MHz
+	 */
 int	clk_pll_set_from_msi	(void)
 {
 	RCC_OscInitTypeDef	osc = {
