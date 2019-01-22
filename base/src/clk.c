@@ -351,7 +351,7 @@ int	clk_pll_set_from_hsi	(void)
 }
 
 	/*
-	 *	VCO_in	= (HSI / M);
+	 *	VCO_in	= (MSI / M);
 	 *		4 MHz < VCO_in < 16 MHz
 	 *	VCO_out	= (VCO_in * N);
 	 *		64 MHz < VCO_out < 344 MHz
@@ -369,10 +369,10 @@ int	clk_pll_set_from_msi	(void)
 			.PLLState		= RCC_PLL_ON,
 			.PLLSource		= RCC_PLLSOURCE_MSI,
 			.PLLM			= 1,
-			.PLLN			= 40,
+			.PLLN			= 80,
 			.PLLP			= RCC_PLLP_DIV7,
 			.PLLQ			= RCC_PLLQ_DIV4,
-			.PLLR			= RCC_PLLR_DIV2
+			.PLLR			= RCC_PLLR_DIV4
 		}
 	};
 
