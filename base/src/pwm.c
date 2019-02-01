@@ -32,44 +32,44 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-# define	TIMx_INSTANCE			(TIM2)
-# define	TIMx_CLK_ENABLE()		__HAL_RCC_TIM2_CLK_ENABLE()
-# define	TIMx_CLK_DISABLE()		__HAL_RCC_TIM2_CLK_DISABLE()
+#define TIMx_INSTANCE			(TIM2)
+#define TIMx_CLK_ENABLE()		__HAL_RCC_TIM2_CLK_ENABLE()
+#define TIMx_CLK_DISABLE()		__HAL_RCC_TIM2_CLK_DISABLE()
 
-# define	TIMx_GPIO_MODE			(GPIO_MODE_AF_OD)
-/*# define	TIMx_GPIO_MODE			(GPIO_MODE_AF_PP)*/
+#define TIMx_GPIO_MODE			(GPIO_MODE_AF_OD)
+/*#define TIMx_GPIO_MODE			(GPIO_MODE_AF_PP)*/
 
-# define	TIMx_CH1_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
-# define	TIMx_CH1_GPIO_PORT		(GPIOA)
-# define	TIMx_CH1_GPIO_PIN		(GPIO_PIN_15)
-# define	TIMx_CH1_GPIO_MODE		(TIMx_GPIO_MODE)
-# define	TIMx_CH1_GPIO_PULL		(GPIO_NOPULL)
-# define	TIMx_CH1_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
-# define	TIMx_CH1_GPIO_ALT		(GPIO_AF1_TIM2)
+#define TIMx_CH1_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
+#define TIMx_CH1_GPIO_PORT		(GPIOA)
+#define TIMx_CH1_GPIO_PIN		(GPIO_PIN_15)
+#define TIMx_CH1_GPIO_MODE		(TIMx_GPIO_MODE)
+#define TIMx_CH1_GPIO_PULL		(GPIO_NOPULL)
+#define TIMx_CH1_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+#define TIMx_CH1_GPIO_ALT		(GPIO_AF1_TIM2)
 
-# define	TIMx_CH2_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
-# define	TIMx_CH2_GPIO_PORT		(GPIOA)
-# define	TIMx_CH2_GPIO_PIN		(GPIO_PIN_1)
-# define	TIMx_CH2_GPIO_MODE		(TIMx_GPIO_MODE)
-# define	TIMx_CH2_GPIO_PULL		(GPIO_NOPULL)
-# define	TIMx_CH2_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
-# define	TIMx_CH2_GPIO_ALT		(GPIO_AF1_TIM2)
+#define TIMx_CH2_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOA_CLK_ENABLE()
+#define TIMx_CH2_GPIO_PORT		(GPIOA)
+#define TIMx_CH2_GPIO_PIN		(GPIO_PIN_1)
+#define TIMx_CH2_GPIO_MODE		(TIMx_GPIO_MODE)
+#define TIMx_CH2_GPIO_PULL		(GPIO_NOPULL)
+#define TIMx_CH2_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+#define TIMx_CH2_GPIO_ALT		(GPIO_AF1_TIM2)
 
-# define	TIMx_CH3_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOB_CLK_ENABLE()
-# define	TIMx_CH3_GPIO_PORT		(GPIOB)
-# define	TIMx_CH3_GPIO_PIN		(GPIO_PIN_10)
-# define	TIMx_CH3_GPIO_MODE		(TIMx_GPIO_MODE)
-# define	TIMx_CH3_GPIO_PULL		(GPIO_NOPULL)
-# define	TIMx_CH3_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
-# define	TIMx_CH3_GPIO_ALT		(GPIO_AF1_TIM2)
+#define TIMx_CH3_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOB_CLK_ENABLE()
+#define TIMx_CH3_GPIO_PORT		(GPIOB)
+#define TIMx_CH3_GPIO_PIN		(GPIO_PIN_10)
+#define TIMx_CH3_GPIO_MODE		(TIMx_GPIO_MODE)
+#define TIMx_CH3_GPIO_PULL		(GPIO_NOPULL)
+#define TIMx_CH3_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+#define TIMx_CH3_GPIO_ALT		(GPIO_AF1_TIM2)
 
-# define	TIMx_CH4_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOB_CLK_ENABLE()
-# define	TIMx_CH4_GPIO_PORT		(GPIOB)
-# define	TIMx_CH4_GPIO_PIN		(GPIO_PIN_11)
-# define	TIMx_CH4_GPIO_MODE		(TIMx_GPIO_MODE)
-# define	TIMx_CH4_GPIO_PULL		(GPIO_NOPULL)
-# define	TIMx_CH4_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
-# define	TIMx_CH4_GPIO_ALT		(GPIO_AF1_TIM2)
+#define TIMx_CH4_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOB_CLK_ENABLE()
+#define TIMx_CH4_GPIO_PORT		(GPIOB)
+#define TIMx_CH4_GPIO_PIN		(GPIO_PIN_11)
+#define TIMx_CH4_GPIO_MODE		(TIMx_GPIO_MODE)
+#define TIMx_CH4_GPIO_PULL		(GPIO_NOPULL)
+#define TIMx_CH4_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+#define TIMx_CH4_GPIO_ALT		(GPIO_AF1_TIM2)
 
 
 /******************************************************************************
@@ -125,11 +125,8 @@ static	void	pwm_timx_ch4_gpio_deinit	(void);
 int	pwm_timx_init		(uint32_t resolution_sec, uint32_t period)
 {
 
-	if (init_pending) {
-		init_pending	= false;
-	} else {
+	if (!init_pending)
 		return	ERROR_OK;
-	}
 
 	TIMx_CLK_ENABLE();
 	if (pwm_timx_clk_conf()) {
@@ -154,6 +151,8 @@ int	pwm_timx_init		(uint32_t resolution_sec, uint32_t period)
 	pwm_timx_ch3_gpio_init();
 	pwm_timx_ch4_gpio_init();
 
+	init_pending	= false;
+
 	return	ERROR_OK;
 
 
@@ -162,11 +161,9 @@ err_master_conf:
 		prj_error	|= ERROR_PWM_HAL_TIM_PWM_DEINIT;
 		prj_error_handle();
 	}
-
 err_init:
 err_clk_conf:
 	TIMx_CLK_DISABLE();
-	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -180,13 +177,12 @@ int	pwm_timx_deinit		(void)
 {
 	int	status;
 
-	status	= ERROR_OK;
-
-	if (!init_pending) {
-		init_pending	= true;
-	} else {
+	if (init_pending)
 		return	status;
-	}
+
+	init_pending	= true;
+
+	status	= ERROR_OK;
 
 	pwm_timx_ch4_gpio_deinit();
 	pwm_timx_ch3_gpio_deinit();

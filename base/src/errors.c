@@ -20,8 +20,6 @@
 
 	#include "stm32l4xx_hal.h"
 
-	#include "libalx/alx_mask.h"
-
 	#include "stm32l4-modules/delay.h"
 	#include "stm32l4-modules/led.h"
 
@@ -31,9 +29,9 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-# define	ERROR_BIT_LEN			(UINT32_C(1000000))
-# define	ERROR_LONG_PULSE_LEN_US		((uint32_t)(ERROR_BIT_LEN * 0.6))
-# define	ERROR_SHORT_PULSE_LEN_US	((uint32_t)(ERROR_BIT_LEN * 0.1))
+#define ERROR_BIT_LEN			(UINT32_C(1000000))
+#define ERROR_LONG_PULSE_LEN_US		((uint32_t)(ERROR_BIT_LEN * 0.6))
+#define ERROR_SHORT_PULSE_LEN_US	((uint32_t)(ERROR_BIT_LEN * 0.1))
 
 
 /******************************************************************************
@@ -101,16 +99,12 @@ void	prj_error_handle	(void)
 static	void	flash_error	(void)
 {
 	int	i;
-	bool	bit;
 
 	for (i = 31; i >= 0; i--) {
-		bit	= (bool)(prj_error & alx_maskgen_u32(i));
-
-		if (bit) {
+		if (prj_error & (UINT32_C(1) << i))
 			flash_long();
-		} else {
+		else
 			flash_short();
-		}
 	}
 }
 

@@ -67,22 +67,22 @@ int	led_test_1	(void)
 {
 	int		i;
 
-	delay_us_init();
+	if (delay_us_init())
+		return	ERROR_NOK;
 	led_init();
 
 	for (i = 0; i <= 100; i++) {
 		led_set();
-		if (delay_us(1000u * i)) {
+		if (delay_us(1000u * i))
 			return	ERROR_NOK;
-		}
 
 		led_reset();
-		if (delay_us(1000u * i)) {
+		if (delay_us(1000u * i))
 			return	ERROR_NOK;
-		}
 	}
 
-	delay_us_deinit();
+	if (delay_us_deinit())
+		return	ERROR_NOK;
 
 	return	ERROR_OK;
 }
@@ -95,22 +95,22 @@ int	led_test_2	(void)
 {
 	int		i;
 
-	delay_ms_init();
+	if (delay_ms_init())
+		return	ERROR_NOK;
 	led_init();
 
 	for (i = 0; i <= 100; i++) {
 		led_set();
-		if (delay_ms(i)) {
+		if (delay_ms(i))
 			return	ERROR_NOK;
-		}
 
 		led_reset();
-		if (delay_ms(i)) {
+		if (delay_ms(i))
 			return	ERROR_NOK;
-		}
 	}
 
-	delay_ms_deinit();
+	if (delay_ms_deinit())
+		return	ERROR_NOK;
 
 	return	ERROR_OK;
 }
@@ -123,22 +123,22 @@ int	led_test_3	(void)
 {
 	int		i;
 
-	delay_it_ms_init();
+	if (delay_it_ms_init())
+		return	ERROR_NOK;
 	led_init();
 
 	for (i = 0; i <= 100; i++) {
 		led_set();
-		if (delay_it_ms(i)) {
+		if (delay_it_ms(i))
 			return	ERROR_NOK;
-		}
 
 		led_reset();
-		if (delay_it_ms(i)) {
+		if (delay_it_ms(i))
 			return	ERROR_NOK;
-		}
 	}
 
-	delay_it_ms_deinit();
+	if (delay_it_ms_deinit())
+		return	ERROR_NOK;
 
 	return	ERROR_OK;
 }

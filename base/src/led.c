@@ -31,12 +31,12 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-# define	LED_G_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOA_CLK_ENABLE()
-# define	LED_G_GPIO_PORT			(GPIOA)
-# define	LED_G_GPIO_PIN			(GPIO_PIN_5)
-# define	LED_G_GPIO_MODE			(GPIO_MODE_OUTPUT_PP)
-# define	LED_G_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
-# define	LED_G_GPIO_PULL			(GPIO_NOPULL)
+#define LED_G_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOA_CLK_ENABLE()
+#define LED_G_GPIO_PORT			(GPIOA)
+#define LED_G_GPIO_PIN			(GPIO_PIN_5)
+#define LED_G_GPIO_MODE			(GPIO_MODE_OUTPUT_PP)
+#define LED_G_GPIO_SPEED		(GPIO_SPEED_FREQ_LOW)
+#define LED_G_GPIO_PULL			(GPIO_NOPULL)
 
 
 /******************************************************************************
@@ -74,15 +74,13 @@ static	void	led_gpio_deinit	(void);
 void	led_init	(void)
 {
 
-	if (init_pending) {
-		init_pending	= false;
-	} else {
+	if (!init_pending)
 		return;
-	}
 
 	led_gpio_init();
-
 	led_reset();
+
+	init_pending	= false;
 }
 
 	/**
@@ -91,14 +89,12 @@ void	led_init	(void)
 void	led_deinit	(void)
 {
 
-	if (!init_pending) {
-		init_pending	= true;
-	} else {
+	if (init_pending)
 		return;
-	}
+
+	init_pending	= true;
 
 	led_reset();
-
 	led_gpio_deinit();
 }
 
@@ -108,9 +104,8 @@ void	led_deinit	(void)
 void	led_set		(void)
 {
 
-	if (init_pending) {
+	if (init_pending)
 		led_init();
-	}
 
 	HAL_GPIO_WritePin(LED_G_GPIO_PORT, LED_G_GPIO_PIN, GPIO_PIN_SET);
 }
@@ -121,9 +116,8 @@ void	led_set		(void)
 void	led_reset	(void)
 {
 
-	if (init_pending) {
+	if (init_pending)
 		led_init();
-	}
 
 	HAL_GPIO_WritePin(LED_G_GPIO_PORT, LED_G_GPIO_PIN, GPIO_PIN_RESET);
 }
@@ -134,9 +128,8 @@ void	led_reset	(void)
 void	led_toggle	(void)
 {
 
-	if (init_pending) {
+	if (init_pending)
 		led_init();
-	}
 
 	HAL_GPIO_TogglePin(LED_G_GPIO_PORT, LED_G_GPIO_PIN);
 }

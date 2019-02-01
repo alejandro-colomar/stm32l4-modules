@@ -32,12 +32,12 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-# define	RESOLUTION_1_US		(1000000u)
-# define	RESOLUTION_1_MS		(1000u)
+#define RESOLUTION_1_US		(1000000u)
+#define RESOLUTION_1_MS		(1000u)
 
-# define	TIMx_INSTANCE		(TIM6)
-# define	TIMx_CLK_ENABLE()	__HAL_RCC_TIM6_CLK_ENABLE()
-# define	TIMx_CLK_DISABLE()	__HAL_RCC_TIM6_CLK_DISABLE()
+#define TIMx_INSTANCE		(TIM6)
+#define TIMx_CLK_ENABLE()	__HAL_RCC_TIM6_CLK_ENABLE()
+#define TIMx_CLK_DISABLE()	__HAL_RCC_TIM6_CLK_DISABLE()
 
 
 /******************************************************************************
@@ -155,6 +155,9 @@ int	delay_us	(uint32_t time_us)
 {
 	uint32_t	overflows;
 
+	if (!time_us)
+		return	ERROR_OK;
+
 	if (!delay_mode) {
 		if (delay_us_init()) {
 			prj_error	|= ERROR_DELAY_INIT;
@@ -167,10 +170,6 @@ int	delay_us	(uint32_t time_us)
 		prj_error	|= ERROR_DELAY_INIT;
 		prj_error_handle();
 		return	ERROR_NOK;
-	}
-
-	if (!time_us) {
-		return	ERROR_OK;
 	}
 
 	delay_delay_init(time_us, &overflows);
@@ -268,6 +267,9 @@ int	delay_ms	(uint32_t time_ms)
 {
 	uint32_t	overflows;
 
+	if (!time_ms)
+		return	ERROR_OK;
+
 	if (!delay_mode) {
 		if (delay_ms_init()) {
 			prj_error	|= ERROR_DELAY_INIT;
@@ -280,10 +282,6 @@ int	delay_ms	(uint32_t time_ms)
 		prj_error	|= ERROR_DELAY_INIT;
 		prj_error_handle();
 		return	ERROR_NOK;
-	}
-
-	if (!time_ms) {
-		return	ERROR_OK;
 	}
 
 	delay_delay_init(time_ms, &overflows);

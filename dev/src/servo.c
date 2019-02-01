@@ -36,16 +36,16 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-		/* Resolution = 1/1000000 s = 1 us */
-	# define	SERVO_PWM_RESOLUTION_s		(1000000u)
+/* Resolution = 1/1000000 s = 1 us */
+#define SERVO_PWM_RESOLUTION_s		(1000000u)
 
-		/* Period = 20 ms = 20000 us */
-	# define	SERVO_PWM_PERIOD_us		(20000u)
+/* Period = 20 ms = 20000 us */
+#define SERVO_PWM_PERIOD_us		(20000u)
 
-		/* Angle = -90 deg -> Duty time = 1 ms -> Duty cycle = 0.05 */
-	# define	SERVO_PWM_DUTY_MIN		(0.020f)/*(0.05f) (from datashit)*/
-		/* Angle = 90 deg -> Duty time = 2 ms -> Duty cycle = 0.1 */
-	# define	SERVO_PWM_DUTY_MAX		(0.120f)/*(0.1f) (from datashit)*/
+/* Angle = -90 deg -> Duty time = 1 ms -> Duty cycle = 0.05 */
+#define SERVO_PWM_DUTY_MIN		(0.020f)/*(0.05f) (from datashit)*/
+/* Angle = 90 deg -> Duty time = 2 ms -> Duty cycle = 0.1 */
+#define SERVO_PWM_DUTY_MAX		(0.120f)/*(0.1f) (from datashit)*/
 
 
 /******************************************************************************
@@ -85,11 +85,8 @@ static	int	servo_duty_calc	(float position, float *duty);
 int	servo_init		(void)
 {
 
-	if (init_pending) {
-		init_pending	= false;
-	} else {
+	if (!init_pending)
 		return	ERROR_OK;
-	}
 
 	if (pwm_timx_init(SERVO_PWM_RESOLUTION_s, SERVO_PWM_PERIOD_us)) {
 		prj_error	|= ERROR_SERVO_PWM_INIT;
@@ -97,18 +94,16 @@ int	servo_init		(void)
 		goto err_init;
 	}
 
-	if (servo_position_set(SERVO_S1, SERVO_ANGLE_DEF)) {
+	if (servo_position_set(SERVO_S1, SERVO_ANGLE_DEF))
 		goto err_ch_set;
-	}
-	if (servo_position_set(SERVO_S2, SERVO_ANGLE_DEF)) {
+	if (servo_position_set(SERVO_S2, SERVO_ANGLE_DEF))
 		goto err_ch_set;
-	}
-	if (servo_position_set(SERVO_S3, SERVO_ANGLE_DEF)) {
+	if (servo_position_set(SERVO_S3, SERVO_ANGLE_DEF))
 		goto err_ch_set;
-	}
-	if (servo_position_set(SERVO_S4, SERVO_ANGLE_DEF)) {
+	if (servo_position_set(SERVO_S4, SERVO_ANGLE_DEF))
 		goto err_ch_set;
-	}
+
+	init_pending	= false;
 
 	return	ERROR_OK;
 
@@ -123,7 +118,6 @@ err_init:
 		prj_error	|= ERROR_SERVO_PWM_DEINIT;
 		prj_error_handle();
 	}
-	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -137,26 +131,21 @@ int	servo_deinit		(void)
 {
 	int	status;
 
+	if (init_pending)
+		return	ERROR_OK;
+
+	init_pending	= true;
+
 	status	= ERROR_OK;
 
-	if (!init_pending) {
-		init_pending	= true;
-	} else {
-		return	status;
-	}
-
-	if (servo_stop(SERVO_S4)) {
+	if (servo_stop(SERVO_S4))
 		status	= ERROR_NOK;
-	}
-	if (servo_stop(SERVO_S3)) {
+	if (servo_stop(SERVO_S3))
 		status	= ERROR_NOK;
-	}
-	if (servo_stop(SERVO_S2)) {
+	if (servo_stop(SERVO_S2))
 		status	= ERROR_NOK;
-	}
-	if (servo_stop(SERVO_S1)) {
+	if (servo_stop(SERVO_S1))
 		status	= ERROR_NOK;
-	}
 	if (pwm_timx_deinit()) {
 		prj_error	|= ERROR_SERVO_PWM_DEINIT;
 		prj_error_handle();
@@ -277,12 +266,10 @@ static	int	servo_duty_calc	(float position, float *duty)
 {
 	int	saturation	= SERVO_SATURATION_OK;
 
-	if (position < (SERVO_ANGLE_MIN)) {
+	if (position < (SERVO_ANGLE_MIN))
 		saturation	= SERVO_SATURATION_NEG;
-	}
-	if (position > (SERVO_ANGLE_MAX)) {
+	else if (position > (SERVO_ANGLE_MAX))
 		saturation	= SERVO_SATURATION_POS;
-	}
 
 	switch (saturation) {
 	case SERVO_SATURATION_NEG:

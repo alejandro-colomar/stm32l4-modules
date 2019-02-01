@@ -21,6 +21,7 @@
  ******************************************************************************/
 	#include <stdbool.h>
 	#include <stdint.h>
+	#include <string.h>
 
 	#include "stm32l4xx_hal.h"
 
@@ -32,59 +33,59 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-# define	CANx_INSTANCE				(CAN1)
-# define	CANx_CLK_ENABLE()			__HAL_RCC_CAN1_CLK_ENABLE()
-# define	CANx_CLK_DISABLE()			__HAL_RCC_CAN1_CLK_DISABLE()
+#define CANx_INSTANCE				(CAN1)
+#define CANx_CLK_ENABLE()			__HAL_RCC_CAN1_CLK_ENABLE()
+#define CANx_CLK_DISABLE()			__HAL_RCC_CAN1_CLK_DISABLE()
 
-# define	CANx_TX_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOA_CLK_ENABLE()
-# define	CANx_TX_GPIO_PORT			(GPIOA)
-# define	CANx_TX_GPIO_PIN			(GPIO_PIN_12)
-# define	CANx_TX_GPIO_MODE			(GPIO_MODE_AF_OD)
-# define	CANx_TX_GPIO_SPEED			(GPIO_SPEED_FREQ_LOW)
-# define	CANx_TX_GPIO_PULL			(GPIO_NOPULL)
-# define	CANx_TX_GPIO_ALT			(GPIO_AF9_CAN1)
+#define CANx_TX_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOA_CLK_ENABLE()
+#define CANx_TX_GPIO_PORT			(GPIOA)
+#define CANx_TX_GPIO_PIN			(GPIO_PIN_12)
+#define CANx_TX_GPIO_MODE			(GPIO_MODE_AF_OD)
+#define CANx_TX_GPIO_SPEED			(GPIO_SPEED_FREQ_LOW)
+#define CANx_TX_GPIO_PULL			(GPIO_NOPULL)
+#define CANx_TX_GPIO_ALT			(GPIO_AF9_CAN1)
 
-# define	CANx_RX_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOA_CLK_ENABLE()
-# define	CANx_RX_GPIO_PORT			(GPIOA)
-# define	CANx_RX_GPIO_PIN			(GPIO_PIN_11)
-# define	CANx_RX_GPIO_MODE			(GPIO_MODE_AF_OD)
-# define	CANx_RX_GPIO_SPEED			(GPIO_SPEED_FREQ_LOW)
-# define	CANx_RX_GPIO_PULL			(GPIO_NOPULL)
-# define	CANx_RX_GPIO_ALT			(GPIO_AF9_CAN1)
+#define CANx_RX_GPIO_CLK_ENABLE()		__HAL_RCC_GPIOA_CLK_ENABLE()
+#define CANx_RX_GPIO_PORT			(GPIOA)
+#define CANx_RX_GPIO_PIN			(GPIO_PIN_11)
+#define CANx_RX_GPIO_MODE			(GPIO_MODE_AF_OD)
+#define CANx_RX_GPIO_SPEED			(GPIO_SPEED_FREQ_LOW)
+#define CANx_RX_GPIO_PULL			(GPIO_NOPULL)
+#define CANx_RX_GPIO_ALT			(GPIO_AF9_CAN1)
 
-# define	CANx_RX0_IRQHandler			CAN1_RX0_IRQHandler
-# define	CANx_RX0_IRQn				(CAN1_RX0_IRQn)
-# define	CANx_PREEMPT_PRIORITY			(1)
-# define	CANx_SUB_PRIORITY			(0)
+#define CANx_RX0_IRQHandler			CAN1_RX0_IRQHandler
+#define CANx_RX0_IRQn				(CAN1_RX0_IRQn)
+#define CANx_PREEMPT_PRIORITY			(1)
+#define CANx_SUB_PRIORITY			(0)
 
-# define	CANx_INIT_TIME_TRIGGERED_MODE		(DISABLE)
-# define	CANx_INIT_AUTO_BUS_OFF			(DISABLE)
-# define	CANx_INIT_AUTO_WAKE_UP			(DISABLE)
-# define	CANx_INIT_AUTO_RETRANSMISSION		(ENABLE)
-# define	CANx_INIT_RECEIVE_FIFO_LOCKED		(DISABLE)
-# define	CANx_INIT_TRANSMIT_FIFO_PRIORITY	(DISABLE)
-# define	CANx_INIT_MODE				(CAN_MODE_NORMAL)
-# define	CANx_INIT_SYNC_JUMP_WIDTH		(CAN_SJW_1TQ)
-# define	CANx_INIT_TIME_SEG_1			(CAN_BS1_4TQ)
-# define	CANx_INIT_TIME_SEG_2			(CAN_BS2_5TQ)
-# define	CANx_INIT_PRESCALER			(SystemCoreClock / 1000000u)
+#define CANx_INIT_TIME_TRIGGERED_MODE		(DISABLE)
+#define CANx_INIT_AUTO_BUS_OFF			(DISABLE)
+#define CANx_INIT_AUTO_WAKE_UP			(DISABLE)
+#define CANx_INIT_AUTO_RETRANSMISSION		(ENABLE)
+#define CANx_INIT_RECEIVE_FIFO_LOCKED		(DISABLE)
+#define CANx_INIT_TRANSMIT_FIFO_PRIORITY	(DISABLE)
+#define CANx_INIT_MODE				(CAN_MODE_NORMAL)
+#define CANx_INIT_SYNC_JUMP_WIDTH		(CAN_SJW_1TQ)
+#define CANx_INIT_TIME_SEG_1			(CAN_BS1_4TQ)
+#define CANx_INIT_TIME_SEG_2			(CAN_BS2_5TQ)
+#define CANx_INIT_PRESCALER			(SystemCoreClock / 1000000u)
 
-# define	CANx_FILTER_ID_HI			(0)
-# define	CANx_FILTER_ID_LO			(0)
-# define	CANx_FILTER_MASK_ID_HI			(0)
-# define	CANx_FILTER_MASK_ID_LO			(0)
-# define	CANx_FILTER_FIFO_ASSIGNMENT		(CAN_FILTER_FIFO0)
-# define	CANx_FILTER_BANK			(5)
-# define	CANx_FILTER_MODE			(CAN_FILTERMODE_IDMASK)
-# define	CANx_FILTER_SCALE			(CAN_FILTERSCALE_16BIT)
-# define	CANx_FILTER_ACTIVATION			(ENABLE)
+#define CANx_FILTER_ID_HI			(0)
+#define CANx_FILTER_ID_LO			(0)
+#define CANx_FILTER_MASK_ID_HI			(0)
+#define CANx_FILTER_MASK_ID_LO			(0)
+#define CANx_FILTER_FIFO_ASSIGNMENT		(CAN_FILTER_FIFO0)
+#define CANx_FILTER_BANK			(5)
+#define CANx_FILTER_MODE			(CAN_FILTERMODE_IDMASK)
+#define CANx_FILTER_SCALE			(CAN_FILTERSCALE_16BIT)
+#define CANx_FILTER_ACTIVATION			(ENABLE)
 
-# define	CANx_TX_HDR_STD_ID			(0x3AAu)
-# define	CANx_TX_HDR_EXT_ID			(0)
-# define	CANx_TX_HDR_IDE				(CAN_ID_STD)
-# define	CANx_TX_HDR_RTR				(CAN_RTR_DATA)
-# define	CANx_TX_HDR_DLC				(CAN_DATA_LEN)
-# define	CANx_TX_HDR_TRANSMISSION_GLOBAL_TIME	(DISABLE)
+#define CANx_TX_HDR_STD_ID			(0x3AAu)
+#define CANx_TX_HDR_EXT_ID			(0)
+#define CANx_TX_HDR_IDE				(CAN_ID_STD)
+#define CANx_TX_HDR_RTR				(CAN_RTR_DATA)
+#define CANx_TX_HDR_DLC				(CAN_DATA_LEN)
+#define CANx_TX_HDR_TRANSMISSION_GLOBAL_TIME	(DISABLE)
 
 
 /******************************************************************************
@@ -140,16 +141,12 @@ static	void	can_tx_header_conf	(void);
 int	can_init	(void)
 {
 
-	if (init_pending) {
-		init_pending	= false;
-	} else {
+	if (!init_pending)
 		return	ERROR_OK;
-	}
 
 	can_msg_pending	= false;
 
 	can_msp_init();
-
 	if (can_peripherial_init()) {
 		prj_error	|= ERROR_CAN_HAL_CAN_INIT;
 		prj_error_handle();
@@ -173,6 +170,8 @@ int	can_init	(void)
 
 	can_tx_header_conf();
 
+	init_pending	= false;
+
 	return	ERROR_OK;
 
 
@@ -181,17 +180,14 @@ err_notif:
 		prj_error	|= ERROR_CAN_HAL_CAN_STOP;
 		prj_error_handle();
 	}
-
 err_start:
 err_filter:
 	if (can_peripherial_deinit()) {
 		prj_error	|= ERROR_CAN_HAL_CAN_DEINIT;
 		prj_error_handle();
 	}
-
 err_peripherial:
 	can_msp_deinit();
-	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -205,13 +201,12 @@ int	can_deinit	(void)
 {
 	int	status;
 
-	status	= ERROR_OK;
+	if (init_pending)
+		return	ERROR_OK;
 
-	if (!init_pending) {
-		init_pending	= true;
-	} else {
-		return	status;
-	}
+	init_pending	= true;
+
+	status	= ERROR_OK;
 
 	if (HAL_CAN_DeactivateNotification(&can, CAN_IT_RX_FIFO0_MSG_PENDING)) {
 		prj_error	|= ERROR_CAN_HAL_CAN_DEACTI_NOTIF;
@@ -229,7 +224,6 @@ int	can_deinit	(void)
 		status	= ERROR_NOK;
 	}
 	can_msp_deinit();
-
 	can_msg_pending	= false;
 
 	return	status;
@@ -244,7 +238,6 @@ int	can_deinit	(void)
 int	can_msg_write	(const uint8_t data [CAN_DATA_LEN])
 {
 	uint8_t	can_tx_data [CAN_DATA_LEN];
-	int	i;
 
 	if (init_pending) {
 		if (can_init()) {
@@ -254,9 +247,7 @@ int	can_msg_write	(const uint8_t data [CAN_DATA_LEN])
 		}
 	}
 
-	for (i = 0; i < CAN_DATA_LEN; i++) {
-		can_tx_data[i]	= data[i];
-	}
+	memcpy(can_tx_data, data, sizeof(can_tx_data));
 
 	if (HAL_CAN_AddTxMessage(&can, &can_tx_header, can_tx_data,
 							&can_tx_mailbox)) {
@@ -277,9 +268,6 @@ int	can_msg_write	(const uint8_t data [CAN_DATA_LEN])
 int	can_msg_read	(uint8_t data [CAN_DATA_LEN])
 {
 	int	status;
-	int	i;
-
-	status	= ERROR_OK;
 
 	if (init_pending) {
 		if (can_init()) {
@@ -289,18 +277,15 @@ int	can_msg_read	(uint8_t data [CAN_DATA_LEN])
 		}
 	}
 
+	status	= ERROR_OK;
+
 	if (!can_msg_pending) {
 		prj_error	|= ERROR_CAN_NO_MSG;
 		status	= ERROR_NOK;
 	}
 
-	for (i = 0; i < CAN_DATA_LEN; i++) {
-		data[i]	= can_rx_data[i];
-	}
-
-	for (i = 0; i < CAN_DATA_LEN; i++) {
-		can_rx_data[i]	= 0;
-	}
+	memcpy(data, can_rx_data, sizeof(can_rx_data));
+	memset(can_rx_data, 0, sizeof(can_rx_data));
 	can_msg_pending	= false;
 
 	return	status;

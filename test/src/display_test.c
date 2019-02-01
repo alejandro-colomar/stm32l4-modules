@@ -66,18 +66,18 @@ int	display_test	(void)
 	int	i;
 	char	ch;
 
-	delay_us_init();
-	display_init();
+	if (delay_us_init())
+		return	ERROR_NOK;
+	if (display_init())
+		return	ERROR_NOK;
 
 	for (i = 0; i <= 9; i++) {
 		ch	= i + '0';
 
-		if (display_set_ch(ch)) {
+		if (display_set_ch(ch))
 			return	ERROR_NOK;
-		}
-		if (delay_us(1000000u)) {
+		if (delay_us(1000000u))
 			return	ERROR_NOK;
-		}
 	}
 
 	return	ERROR_OK;

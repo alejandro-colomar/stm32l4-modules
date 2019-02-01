@@ -61,7 +61,7 @@
 static	void	display_data_clear	(uint16_t display_data[DISPLAY_ROWS]);
 static	void	display_data_set	(Nunchuk_Data_s	nunchuk_data,
 					uint16_t display_data[DISPLAY_ROWS]);
-static	void	nunchuk_servo_set	(Nunchuk_Data_s	nunchuk_data);
+static	int	nunchuk_servo_set	(Nunchuk_Data_s	nunchuk_data);
 
 
 /******************************************************************************
@@ -74,9 +74,12 @@ static	void	nunchuk_servo_set	(Nunchuk_Data_s	nunchuk_data);
 int	nunchuk_test_0	(void)
 {
 	led_init();
-	delay_us_init();
-	servo_init();
-	nunchuk_init();
+	if (delay_us_init())
+		return	ERROR_NOK;
+	if (servo_init())
+		return	ERROR_NOK;
+	if (nunchuk_init())
+		return	ERROR_NOK;
 
 	led_set();
 
@@ -92,20 +95,21 @@ int	nunchuk_test_1	(void)
 	Nunchuk_Data_s	nunchuk_data;
 	uint16_t	display_data [DISPLAY_ROWS];
 
-	delay_us_init();
-	display_init();
-	nunchuk_init();
+	if (delay_us_init())
+		return	ERROR_NOK;
+	if (servo_init())
+		return	ERROR_NOK;
+	if (nunchuk_init())
+		return	ERROR_NOK;
 
 	do {
-		if (nunchuk_read(&nunchuk_data)) {
+		if (nunchuk_read(&nunchuk_data))
 			return	ERROR_NOK;
-		}
 
 		display_data_set(nunchuk_data, display_data);
 
-		if (delay_us(1000000u)) {
+		if (delay_us(1000000u))
 			return	ERROR_NOK;
-		}
 	} while (!nunchuk_data.btn_z);
 
 	return	ERROR_OK;
@@ -120,9 +124,12 @@ int	nunchuk_test_2	(void)
 	Nunchuk_Data_s	nunchuk_data;
 
 	led_init();
-	delay_us_init();
-	servo_init();
-	nunchuk_init();
+	if (delay_us_init())
+		return	ERROR_NOK;
+	if (servo_init())
+		return	ERROR_NOK;
+	if (nunchuk_init())
+		return	ERROR_NOK;
 
 	do {
 		if (nunchuk_read(&nunchuk_data)) {
@@ -131,12 +138,15 @@ int	nunchuk_test_2	(void)
 		}
 
 		led_set();
-		delay_us(100000u);
+		if (delay_us(100000u))
+			return	ERROR_NOK;
 
-		nunchuk_servo_set(nunchuk_data);
+		if (nunchuk_servo_set(nunchuk_data))
+			return	ERROR_NOK;
 
 		led_reset();
-		delay_us(100000u);
+		if (delay_us(100000u))
+			return	ERROR_NOK;
 	} while (true);
 //	} while (!nunchuk_data.btn_z);
 
@@ -151,9 +161,8 @@ static	void	display_data_clear	(uint16_t display_data[DISPLAY_ROWS])
 {
 	int	i;
 
-	for (i = 0; i < DISPLAY_ROWS; i++) {
+	for (i = 0; i < DISPLAY_ROWS; i++)
 		display_data[i]	= DISPLAY_ROW(i);
-	}
 }
 
 static	void	display_data_set	(Nunchuk_Data_s	nunchuk_data,
@@ -175,20 +184,18 @@ static	void	display_data_set	(Nunchuk_Data_s	nunchuk_data,
 	}
 }
 
-static	void	nunchuk_servo_set	(Nunchuk_Data_s	nunchuk_data)
+static	int	nunchuk_servo_set	(Nunchuk_Data_s	nunchuk_data)
 {
-	if (servo_position_set(SERVO_S1, ((float)nunchuk_data.acc.x8 / UINT8_MAX * 90))) {
-		return;
-	}
-	if (servo_position_set(SERVO_S2, ((float)nunchuk_data.acc.y8 / UINT8_MAX * 90))) {
-		return;
-	}
-	if (servo_position_set(SERVO_S3, ((float)nunchuk_data.acc.z8 / UINT8_MAX * 90))) {
-		return;
-	}
-	if (servo_position_set(SERVO_S4, ((float)nunchuk_data.jst.x / UINT8_MAX * 90))) {
-		return;
-	}
+	if (servo_position_set(SERVO_S1, ((float)nunchuk_data.acc.x8 / UINT8_MAX * 90)))
+		return	ERROR_NOK;
+	if (servo_position_set(SERVO_S2, ((float)nunchuk_data.acc.y8 / UINT8_MAX * 90)))
+		return	ERROR_NOK;
+	if (servo_position_set(SERVO_S3, ((float)nunchuk_data.acc.z8 / UINT8_MAX * 90)))
+		return	ERROR_NOK;
+	if (servo_position_set(SERVO_S4, ((float)nunchuk_data.jst.x / UINT8_MAX * 90)))
+		return	ERROR_NOK;
+
+	return	ERROR_OK;
 }
 
 

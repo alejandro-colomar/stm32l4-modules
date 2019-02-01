@@ -34,22 +34,22 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-	# define	NUNCHUK_ADDRESS			(0x52u)
+#define NUNCHUK_ADDRESS			(0x52u)
 
-	# define	NUNCHUK_COMMAND_START_0_LEN	(2)
-	# define	NUNCHUK_COMMAND_START_0_DATA	(uint8_t [2]){0x40u, 0x00u}
+#define NUNCHUK_COMMAND_START_0_LEN	(2)
+#define NUNCHUK_COMMAND_START_0_DATA	(uint8_t [2]){0x40u, 0x00u}
 
-	# define	NUNCHUK_COMMAND_START_1_LEN	(2)
-	# define	NUNCHUK_COMMAND_START_1_DATA	(uint8_t [2]){0xF0u, 0x55u}
+#define NUNCHUK_COMMAND_START_1_LEN	(2)
+#define NUNCHUK_COMMAND_START_1_DATA	(uint8_t [2]){0xF0u, 0x55u}
 
-	# define	NUNCHUK_COMMAND_START_2_LEN	(2)
-	# define	NUNCHUK_COMMAND_START_2_DATA	(uint8_t [2]){0xFBu, 0x00u}
+#define NUNCHUK_COMMAND_START_2_LEN	(2)
+#define NUNCHUK_COMMAND_START_2_DATA	(uint8_t [2]){0xFBu, 0x00u}
 
-	# define	NUNCHUK_COMMAND_GETDATA_LEN	(1)
-	# define	NUNCHUK_COMMAND_GETDATA_DATA	(uint8_t [1]){0x00}
+#define NUNCHUK_COMMAND_GETDATA_LEN	(1)
+#define NUNCHUK_COMMAND_GETDATA_DATA	(uint8_t [1]){0x00}
 
-	# define	NUNCHUK_DATA_LEN		(6)
-	# define	NUNCHUK_DATA_KEY		(UINT8_C(0x17))
+#define NUNCHUK_DATA_LEN		(6)
+#define NUNCHUK_DATA_KEY		(UINT8_C(0x17))
 
 
 /******************************************************************************
@@ -90,11 +90,8 @@ static	void	nunchuk_extract_data	(uint8_t buff [NUNCHUK_DATA_LEN],
 int	nunchuk_init	(void)
 {
 
-	if (init_pending) {
-		init_pending	= false;
-	} else {
+	if (!init_pending)
 		return	ERROR_OK;
-	}
 
 	if (i2c_init()) {
 		prj_error	|= ERROR_NUNCHUK_I2C_INIT;
@@ -112,6 +109,8 @@ int	nunchuk_init	(void)
 		goto err_nunchuk;
 	}
 
+	init_pending	= false;
+
 	return	ERROR_OK;
 
 
@@ -122,7 +121,6 @@ err_slave:
 		prj_error_handle();
 	}
 err_init:
-	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -136,13 +134,12 @@ int	nunchuk_deinit	(void)
 {
 	int	status;
 
-	status	= ERROR_OK;
+	if (!init_pending)
+		return	ERROR_OK;
 
-	if (!init_pending) {
-		init_pending	= true;
-	} else {
-		return	status;
-	}
+	init_pending	= true;
+
+	status	= ERROR_OK;
 
 	if (i2c_deinit()) {
 		prj_error	|= ERROR_NUNCHUK_I2C_DEINIT;
@@ -179,7 +176,6 @@ int	nunchuk_read	(Nunchuk_Data_s *data)
 	}
 	while (!i2c_ready()) {
 //		__WFI();
-		__NOP();
 	}
 
 	if (i2c_msg_read(NUNCHUK_ADDRESS, NUNCHUK_DATA_LEN, buff)) {
@@ -189,7 +185,6 @@ int	nunchuk_read	(Nunchuk_Data_s *data)
 	}
 	while (!i2c_ready()) {
 //		__WFI();
-		__NOP();
 	}
 
 	nunchuk_extract_data(buff, data);
@@ -212,7 +207,6 @@ static	int	nunchuk_start		(void)
 	}
 	while (!i2c_ready()) {
 //		__WFI();
-		__NOP();
 	}
 
 	if (i2c_msg_write(NUNCHUK_ADDRESS, NUNCHUK_COMMAND_START_1_LEN,
@@ -223,7 +217,6 @@ static	int	nunchuk_start		(void)
 	}
 	while (!i2c_ready()) {
 //		__WFI();
-		__NOP();
 	}
 
 	if (i2c_msg_write(NUNCHUK_ADDRESS, NUNCHUK_COMMAND_START_2_LEN,
@@ -234,7 +227,6 @@ static	int	nunchuk_start		(void)
 	}
 	while (!i2c_ready()) {
 //		__WFI();
-		__NOP();
 	}
 
 	return	ERROR_OK;
@@ -249,9 +241,9 @@ static	void	nunchuk_extract_data	(uint8_t buff [NUNCHUK_DATA_LEN],
 	data->acc.x8	= buff[2];
 	data->acc.y8	= buff[3];
 	data->acc.z8	= buff[4];
-	data->acc.x10	= (buff[2] << 2) | (buff[5] & 0x0Cu);
-	data->acc.y10	= (buff[3] << 2) | (buff[5] & 0x30u);
-	data->acc.z10	= (buff[4] << 2) | (buff[5] & 0xC0u);
+	data->acc.x10	= ((uint16_t)buff[2] << 2) | (buff[5] & 0x0Cu);
+	data->acc.y10	= ((uint16_t)buff[3] << 2) | (buff[5] & 0x30u);
+	data->acc.z10	= ((uint16_t)buff[4] << 2) | (buff[5] & 0xC0u);
 	data->btn_c	= !(buff[5] & 0x02);
 	data->btn_z	= !(buff[5] & 0x01);
 }

@@ -21,7 +21,7 @@
  ******************************************************************************/
 	#include <stdbool.h>
 	#include <stdint.h>
-	#include <stdnoreturn.h>
+	#include <string.h>
 
 	#include "stm32l4xx_hal.h"
 
@@ -60,7 +60,7 @@
  ******* static functions (prototypes) ****************************************
  ******************************************************************************/
 static	int	can_tst_msg_write	(int i, int8_t buff[CAN_DATA_LEN]);
-static	void	can_tst_msg_show	(int i, int8_t buff[CAN_DATA_LEN]);
+static	int	can_tst_msg_show	(int i, int8_t buff[CAN_DATA_LEN]);
 
 
 /******************************************************************************
@@ -69,47 +69,60 @@ static	void	can_tst_msg_show	(int i, int8_t buff[CAN_DATA_LEN]);
 	/**
 	 * @brief	Test can: write
 	 */
-noreturn void	can_w_test	(void)
+int	can_w_test	(void)
 {
 	int8_t	buff [CAN_DATA_LEN];
 	int	i	= 0;
 
-	delay_us_init();
-	can_init();
+	if (delay_us_init())
+		return	ERROR_NOK;
+	if (can_init())
+		return	ERROR_NOK;
 
-	delay_us(2000000u);
+	if (delay_us(2000000u))
+		return	ERROR_NOK;
+
 	while (true) {
 		i++;
 		i	%= 8;
 
-		can_tst_msg_write(i, buff);
+		if (can_tst_msg_write(i, buff))
+			return	ERROR_NOK;
 
-		delay_us(2500000u - (2*100000u*i));
+		if (delay_us(2500000u - (2*100000u*i)))
+			return	ERROR_NOK;
 	}
 }
 
 	/**
 	 * @brief	Test can: read
 	 */
-noreturn void	can_r_test	(void)
+int	can_r_test	(void)
 {
 	int8_t	buff [CAN_DATA_LEN];
 	int	i	= 0;
 
-	delay_us_init();
+	if (delay_us_init())
+		return	ERROR_NOK;
 	led_init();
-	can_init();
+	if (can_init())
+		return	ERROR_NOK;
 
-	delay_us(3000000u);
+	if (delay_us(3000000u))
+		return	ERROR_NOK;
+
 	while (true) {
 		i++;
 		i	%= 8;
 
-		can_msg_read((uint8_t *)buff);
+		if (can_msg_read((uint8_t *)buff))
+			return	ERROR_NOK;
 
-		can_tst_msg_show(i, buff);
+		if (can_tst_msg_show(i, buff))
+			return	ERROR_NOK;
 
-		delay_us(2500000u - (2*100000u*i));
+		if (delay_us(2500000u - (2*100000u*i)))
+			return	ERROR_NOK;
 	}
 }
 
@@ -119,32 +132,28 @@ noreturn void	can_r_test	(void)
  ******************************************************************************/
 static	int	can_tst_msg_write	(int i, int8_t buff[CAN_DATA_LEN])
 {
-	buff[0]	= i;
-	buff[1]	= i;
-	buff[2]	= i;
-	buff[3]	= i;
-	buff[4]	= i;
-	buff[5]	= i;
-	buff[6]	= i;
-	buff[7]	= i;
+	memset(buff, i, CAN_DATA_LEN);
 
-	if (can_msg_write((uint8_t *)buff)) {
+	if (can_msg_write((uint8_t *)buff))
 		return	ERROR_NOK;
-	}
 
 	return	ERROR_OK;
 }
 
-static	void	can_tst_msg_show	(int i, int8_t buff[CAN_DATA_LEN])
+static	int	can_tst_msg_show	(int i, int8_t buff[CAN_DATA_LEN])
 {
 	int	j;
 
 	for (j = 0; j < buff[i]; j++) {
 		led_set();
-		delay_us(100000u);
+		if (delay_us(100000u))
+			return	ERROR_NOK;
 		led_reset();
-		delay_us(100000u);
+		if (delay_us(100000u))
+			return	ERROR_NOK;
 	}
+
+	return	ERROR_OK;
 }
 
 

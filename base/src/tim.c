@@ -86,11 +86,10 @@ static	int	tim_it_tim_deinit	(void);
 int	tim_it_init		(uint16_t period_us)
 {
 
-	if (init_pending) {
-		init_pending	= false;
-	} else {
+	if (!init_pending)
 		return	ERROR_OK;
-	}
+
+	init_pending	= false;
 
 	*tim_it_timx_interrupt_ptr	= false;
 
@@ -119,7 +118,6 @@ err_start:
 err_init:
 	tim_it_nvic_deconf();
 	TIMx_CLK_DISABLE();
-	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -133,13 +131,12 @@ int	tim_it_deinit		(void)
 {
 	int	status;
 
-	status	= ERROR_OK;
-
-	if (!init_pending) {
-		init_pending	= true;
-	} else {
+	if (init_pending)
 		return	status;
-	}
+
+	init_pending	= true;
+
+	status	= ERROR_OK;
 
 	if (HAL_TIM_Base_Stop_IT(&tim)) {
 		prj_error	|= ERROR_TIM_HAL_TIM_STOP_IT;
@@ -177,11 +174,10 @@ void	TIMx_IRQHandler			(void)
 void	HAL_TIM_PeriodElapsedCallback	(TIM_HandleTypeDef *tim_ptr)
 {
 
-	if (tim_ptr->Instance == TIM3) {
+	if (tim_ptr->Instance == TIM3)
 		tim_tim3_interrupt	= true;
-	} else if (tim_ptr->Instance == TIM4) {
+	else if (tim_ptr->Instance == TIM4)
 		tim_tim4_interrupt	= true;
-	}
 }
 
 

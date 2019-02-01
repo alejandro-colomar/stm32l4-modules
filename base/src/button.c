@@ -29,18 +29,18 @@
 /******************************************************************************
  ******* macros ***************************************************************
  ******************************************************************************/
-# define	BUTTON_EXTI_LINE		(GPIO_PIN_13)
+#define BUTTON_EXTI_LINE		(GPIO_PIN_13)
 
-# define	BUTTON_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOC_CLK_ENABLE()
-# define	BUTTON_GPIO_PORT		(GPIOC)
-# define	BUTTON_GPIO_PIN			(BUTTON_EXTI_LINE)
-# define	BUTTON_GPIO_MODE		(GPIO_MODE_IT_FALLING)
-# define	BUTTON_GPIO_PULL		(GPIO_NOPULL)
+#define BUTTON_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOC_CLK_ENABLE()
+#define BUTTON_GPIO_PORT		(GPIOC)
+#define BUTTON_GPIO_PIN			(BUTTON_EXTI_LINE)
+#define BUTTON_GPIO_MODE		(GPIO_MODE_IT_FALLING)
+#define BUTTON_GPIO_PULL		(GPIO_NOPULL)
 
-# define	EXTIx_IRQHandler		EXTI15_10_IRQHandler
-# define	EXTIx_IRQn			(EXTI15_10_IRQn)
-# define	EXTIx_PREEMPT_PRIORITY		(2)
-# define	EXTIx_SUB_PRIORITY		(0)
+#define EXTIx_IRQHandler		EXTI15_10_IRQHandler
+#define EXTIx_IRQn			(EXTI15_10_IRQn)
+#define EXTIx_PREEMPT_PRIORITY		(2)
+#define EXTIx_SUB_PRIORITY		(0)
 
 
 /******************************************************************************
@@ -81,16 +81,14 @@ static	void	button_nvic_deconf	(void);
 void	button_init	(void)
 {
 
-	if (init_pending) {
-		init_pending	= false;
-	} else {
+	if (!init_pending)
 		return;
-	}
 
 	button_gpio_init();
 	button_nvic_conf();
-
 	button_interrupt	= false;
+
+	init_pending	= false;
 }
 
 	/**
@@ -99,15 +97,13 @@ void	button_init	(void)
 void	button_deinit	(void)
 {
 
-	if (!init_pending) {
-		init_pending	= true;
-	} else {
+	if (init_pending)
 		return;
-	}
+
+	init_pending	= true;
 
 	button_nvic_deconf();
 	button_gpio_deinit();
-
 	button_interrupt	= false;
 }
 
@@ -121,9 +117,8 @@ void	button_deinit	(void)
 void	EXTIx_IRQHandler	(void)
 {
 
-	if (__HAL_GPIO_EXTI_GET_IT(BUTTON_EXTI_LINE)) {
+	if (__HAL_GPIO_EXTI_GET_IT(BUTTON_EXTI_LINE))
 		HAL_GPIO_EXTI_IRQHandler(BUTTON_GPIO_PIN);
-	}
 }
 
 	/**

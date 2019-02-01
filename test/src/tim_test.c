@@ -76,17 +76,14 @@ int	tim_test	(void)
 
 	period_us	= 65000u;
 
-	if (delay_us_init()) {
+	if (delay_us_init())
 		return	ERROR_NOK;
-	}
 	led_init();
-	if (tim_it_init(period_us)) {
+	if (tim_it_init(period_us))
 		return	ERROR_NOK;
-	}
 
-	if (execution_loop(period_us)) {
+	if (execution_loop(period_us))
 		return	ERROR_NOK;
-	}
 
 	return	ERROR_OK;
 }

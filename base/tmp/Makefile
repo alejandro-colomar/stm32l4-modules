@@ -73,16 +73,13 @@ DEL_IT_INC_DIRS		= -I $(INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 
-ERRORS_INC_LIBALX	= libalx/alx_mask.h
 ERRORS_INC		= stm32l4-modules/errors.h \
 				stm32l4-modules/delay.h \
 				stm32l4-modules/led.h
 ERRORS_DEPS		= $(SRC_DIR)/errors.c \
 			$(COMMON_DEPS) \
-			$(patsubst %,$(LIBALX_INC_DIR)/%,$(ERRORS_INC_LIBALX)) \
 			$(patsubst %,$(INC_DIR)/%,$(ERRORS_INC))
 ERRORS_INC_DIRS		= -I $(INC_DIR) \
-			-I $(LIBALX_INC_DIR) \
 			$(COMMON_INC_DIRS)
 
 

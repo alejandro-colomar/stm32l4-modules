@@ -86,11 +86,8 @@ static	void	delay_it_nvic_deconf	(void);
 int	delay_it_ms_init	(void)
 {
 
-	if (init_pending) {
-		init_pending	= false;
-	} else {
+	if (!init_pending)
 		return	ERROR_OK;
-	}
 
 	TIMx_CLK_ENABLE();
 	delay_it_nvic_conf();
@@ -100,13 +97,14 @@ int	delay_it_ms_init	(void)
 		goto err_init;
 	}
 
+	init_pending	= false;
+
 	return	ERROR_OK;
 
 
 err_init:
 	delay_it_nvic_deconf();
 	TIMx_CLK_DISABLE();
-	init_pending	= true;
 
 	return	ERROR_NOK;
 }
@@ -120,13 +118,12 @@ int	delay_it_ms_deinit	(void)
 {
 	int	status;
 
-	status	= ERROR_OK;
+	if (init_pending)
+		return	ERROR_OK;
 
-	if (!init_pending) {
-		init_pending	= true;
-	} else {
-		return	status;
-	}
+	init_pending	= true;
+
+	status	= ERROR_OK;
 
 	if (delay_it_tim_deinit()) {
 		prj_error	|= ERROR_DELAY_HAL_TIM_DEINIT;
@@ -150,16 +147,15 @@ int	delay_it_ms		(uint32_t time_ms)
 {
 	uint32_t	overflows;
 
+	if (!time_ms)
+		return	ERROR_OK;
+
 	if (init_pending) {
 		if (delay_it_ms_init()) {
 			prj_error	|= ERROR_DELAY_INIT;
 			prj_error_handle();
 			return	ERROR_NOK;
 		}
-	}
-
-	if (!time_ms) {
-		return	ERROR_OK;
 	}
 
 	delay_it_delay_init(time_ms, &overflows);
