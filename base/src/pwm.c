@@ -178,7 +178,7 @@ int	pwm_timx_deinit		(void)
 	int	status;
 
 	if (init_pending)
-		return	status;
+		return	ERROR_OK;
 
 	init_pending	= true;
 
