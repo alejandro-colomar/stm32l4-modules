@@ -241,9 +241,9 @@ static	void	nunchuk_extract_data	(uint8_t buff [NUNCHUK_DATA_LEN],
 	data->acc.x8	= buff[2];
 	data->acc.y8	= buff[3];
 	data->acc.z8	= buff[4];
-	data->acc.x10	= (buff[2] << 2)  |  ((buff[5] & 0x0Cu) >> 2);
-	data->acc.y10	= (buff[3] << 2)  |  ((buff[5] & 0x30u) >> 4);
-	data->acc.z10	= (buff[4] << 2)  |  ((buff[5] & 0xC0u) >> 6);
+	data->acc.x10	= ((uint16_t)buff[2] << 2)  |  ((buff[5] & 0x0Cu) >> 2);
+	data->acc.y10	= ((uint16_t)buff[3] << 2)  |  ((buff[5] & 0x30u) >> 4);
+	data->acc.z10	= ((uint16_t)buff[4] << 2)  |  ((buff[5] & 0xC0u) >> 6);
 	data->btn_c	= !(buff[5] & 0x02);
 	data->btn_z	= !(buff[5] & 0x01);
 }
