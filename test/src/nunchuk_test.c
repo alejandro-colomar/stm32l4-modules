@@ -186,13 +186,22 @@ static	void	display_data_set	(Nunchuk_Data_s	nunchuk_data,
 
 static	int	nunchuk_servo_set	(Nunchuk_Data_s	nunchuk_data)
 {
-	if (servo_position_set(SERVO_S1, ((float)nunchuk_data.acc.x8 / UINT8_MAX * 90)))
+	float	pos;
+
+	pos	= (float)nunchuk_data.acc.x8 / UINT8_MAX * 90.0;
+	if (servo_position_set(SERVO_S1, pos))
 		return	ERROR_NOK;
-	if (servo_position_set(SERVO_S2, ((float)nunchuk_data.acc.y8 / UINT8_MAX * 90)))
+
+	pos	= (float)nunchuk_data.acc.y8 / UINT8_MAX * 90.0;
+	if (servo_position_set(SERVO_S2, pos))
 		return	ERROR_NOK;
-	if (servo_position_set(SERVO_S3, ((float)nunchuk_data.acc.z8 / UINT8_MAX * 90)))
+
+	pos	= (float)nunchuk_data.acc.z8 / UINT8_MAX * 90.0;
+	if (servo_position_set(SERVO_S3, pos))
 		return	ERROR_NOK;
-	if (servo_position_set(SERVO_S4, ((float)nunchuk_data.jst.x / UINT8_MAX * 90)))
+
+	pos	= (float)nunchuk_data.jst.x / UINT8_MAX * 90.0;
+	if (servo_position_set(SERVO_S4, pos))
 		return	ERROR_NOK;
 
 	return	ERROR_OK;
