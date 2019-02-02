@@ -22,8 +22,6 @@
 
 	#include "stm32l4xx_hal.h"
 
-	#include "libalx/alx_mask.h"
-
 	#include "stm32l4-modules/delay.h"
 	#include "stm32l4-modules/errors.h"
 	#include "stm32l4-modules/led.h"

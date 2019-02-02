@@ -139,7 +139,7 @@ int	delay_it_ms_deinit	(void)
 	/**
 	 * @brief	Delay <time_ms> microseconds
 	 * @param	time_ms:	Delay value (ms)
-	 * 			This value should not exceed (UINT32_MAX / 10)
+	 *			This value should not exceed (UINT32_MAX / 10)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
@@ -201,7 +201,7 @@ static	int	delay_it_tim_init	(void)
 		.Instance	= TIMx_INSTANCE,
 		.Init		= {
 			.Prescaler		= ((SystemCoreClock /
-							RESOLUTION_100_US) - 1u),
+							RESOLUTION_100_US) - 1),
 			.CounterMode		= TIM_COUNTERMODE_UP,
 			.Period			= UINT16_MAX,
 			.ClockDivision		= TIM_CLOCKDIVISION_DIV1,
@@ -221,9 +221,9 @@ static	void	delay_it_delay_init	(uint32_t time_ms, uint32_t *overflows)
 
 	time_res	= time_ms * (RESOLUTION_100_US / RESOLUTION_1_MS);
 
-	*overflows	= (time_res / ((uint32_t)UINT16_MAX + 1u)) + 1u;
-	partial		= time_res % ((uint32_t)UINT16_MAX + 1u);
-	counter_initial	= (uint32_t)UINT16_MAX + 1u - partial;
+	*overflows	= (time_res / ((uint32_t)UINT16_MAX + 1)) + 1;
+	partial		= time_res % ((uint32_t)UINT16_MAX + 1);
+	counter_initial	= (uint32_t)UINT16_MAX + 1 - partial;
 
 	__HAL_TIM_SET_COUNTER(&tim, counter_initial);
 }

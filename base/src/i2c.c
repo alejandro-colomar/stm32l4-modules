@@ -189,7 +189,7 @@ int	i2c_deinit	(void)
 bool	i2c_ready	(void)
 {
 
-	return	(HAL_I2C_STATE_READY == HAL_I2C_GetState(&i2c));
+	return	(HAL_I2C_GetState(&i2c) == HAL_I2C_STATE_READY);
 }
 
 	/**
@@ -225,7 +225,8 @@ int	i2c_chk_slave	(uint8_t addr)
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
-int	i2c_msg_write	(uint8_t addr, uint8_t data_len, const uint8_t data [data_len])
+int	i2c_msg_write	(uint8_t addr, uint8_t data_len,
+				const uint8_t data [data_len])
 {
 	uint8_t	buff [data_len];
 
@@ -353,7 +354,8 @@ static	void	i2c_gpio_deinit		(void)
 static	void	i2c_nvic_conf		(void)
 {
 
-	HAL_NVIC_SetPriority(I2Cx_EV_IRQn, I2Cx_PREEMPT_PRIORITY, I2Cx_SUB_PRIORITY);
+	HAL_NVIC_SetPriority(I2Cx_EV_IRQn, I2Cx_PREEMPT_PRIORITY,
+						I2Cx_SUB_PRIORITY);
 	HAL_NVIC_EnableIRQ(I2Cx_EV_IRQn);
 }
 
