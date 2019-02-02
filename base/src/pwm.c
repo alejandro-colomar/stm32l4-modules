@@ -98,7 +98,7 @@ static	TIM_OC_InitTypeDef	oc_init;
  ******************************************************************************/
 static	int	pwm_timx_clk_conf		(void);
 static	int	pwm_timx_tim_init		(uint32_t resolution_sec,
-								uint32_t period);
+							uint32_t period);
 static	int	pwm_timx_tim_deinit		(void);
 static	int	pwm_timx_master_conf		(void);
 static	void	pwm_timx_oc_conf		(void);
@@ -118,7 +118,7 @@ static	void	pwm_timx_ch4_gpio_deinit	(void);
 	/**
 	 * @brief	Initialize PWM using TIMx
 	 * @param	resolution_sec:	divisions in 1 s
-	 * @param	period:		period of the pwm (in resolution_sec units)
+	 * @param	period:		in resolution_sec units
 	 * @return	Error
 	 * @note	Sets global variable 'prj_error'
 	 */
