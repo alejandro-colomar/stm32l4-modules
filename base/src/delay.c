@@ -43,11 +43,11 @@
 /******************************************************************************
  ******* enums ****************************************************************
  ******************************************************************************/
-	enum	Delay_Mode {
-		DELAY_MODE_OFF,
-		DELAY_MODE_US,
-		DELAY_MODE_MS
-	};
+enum	Delay_Mode {
+	DELAY_MODE_OFF,
+	DELAY_MODE_US,
+	DELAY_MODE_MS
+};
 
 
 /******************************************************************************
@@ -310,7 +310,7 @@ int	delay_ms	(uint32_t time_ms)
 static	int	delay_us_tim_init	(void)
 {
 
-	tim	= (TIM_HandleTypeDef){
+	tim	= (const TIM_HandleTypeDef){
 		.Instance	= TIMx_INSTANCE,
 		.Init		= {
 			.Prescaler		= ((SystemCoreClock /
@@ -329,7 +329,7 @@ static	int	delay_us_tim_init	(void)
 static	int	delay_ms_tim_init	(void)
 {
 
-	tim	= (TIM_HandleTypeDef){
+	tim	= (const TIM_HandleTypeDef){
 		.Instance	= TIMx_INSTANCE,
 		.Init		= {
 			.Prescaler		= ((SystemCoreClock /

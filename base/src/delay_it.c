@@ -197,7 +197,7 @@ void	TIMx_IRQHandler			(void)
 static	int	delay_it_tim_init	(void)
 {
 
-	tim	= (TIM_HandleTypeDef){
+	tim	= (const TIM_HandleTypeDef){
 		.Instance	= TIMx_INSTANCE,
 		.Init		= {
 			.Prescaler		= ((SystemCoreClock /

@@ -368,7 +368,7 @@ static	void	i2c_nvic_deconf		(void)
 static	int	i2c_peripherial_init	(void)
 {
 
-	i2c	= (I2C_HandleTypeDef){
+	i2c	= (const I2C_HandleTypeDef){
 		.Instance		= I2Cx_INSTANCE,
 		.Init	= {
 			.Timing			= I2Cx_INIT_TIMING,

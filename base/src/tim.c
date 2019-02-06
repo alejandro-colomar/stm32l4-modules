@@ -201,7 +201,7 @@ static	void	tim_it_nvic_deconf	(void)
 static	int	tim_it_tim_init	(uint16_t period_us)
 {
 
-	tim	= (TIM_HandleTypeDef){
+	tim	= (const TIM_HandleTypeDef){
 		.Instance	= TIMx_INSTANCE,
 		.Init		= {
 			.Prescaler		= ((SystemCoreClock /

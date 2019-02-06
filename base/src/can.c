@@ -353,7 +353,7 @@ static	void	can_gpio_init		(void)
 	GPIO_InitTypeDef	gpio;
 
 	CANx_TX_GPIO_CLK_ENABLE();
-	gpio	= (GPIO_InitTypeDef){
+	gpio	= (const GPIO_InitTypeDef){
 		.Pin		= CANx_TX_GPIO_PIN,
 		.Mode		= CANx_TX_GPIO_MODE,
 		.Speed		= CANx_TX_GPIO_SPEED,
@@ -363,7 +363,7 @@ static	void	can_gpio_init		(void)
 	HAL_GPIO_Init(CANx_TX_GPIO_PORT, &gpio);
 
 	CANx_RX_GPIO_CLK_ENABLE();
-	gpio	= (GPIO_InitTypeDef){
+	gpio	= (const GPIO_InitTypeDef){
 		.Pin		= CANx_RX_GPIO_PIN,
 		.Mode		= CANx_RX_GPIO_MODE,
 		.Speed		= CANx_RX_GPIO_SPEED,
@@ -405,7 +405,7 @@ static	void	can_nvic_deconf		(void)
 static	int	can_peripherial_init	(void)
 {
 
-	can	= (CAN_HandleTypeDef){
+	can	= (const CAN_HandleTypeDef){
 		.Instance	= CANx_INSTANCE,
 		.Init		= {
 			.TimeTriggeredMode	= CANx_INIT_TIME_TRIGGERED_MODE,
@@ -451,7 +451,7 @@ static	int	can_filter_conf		(void)
 static	void	can_tx_header_conf	(void)
 {
 
-	can_tx_header	= (CAN_TxHeaderTypeDef){
+	can_tx_header	= (const CAN_TxHeaderTypeDef){
 		.StdId			= CANx_TX_HDR_STD_ID,
 		.ExtId			= CANx_TX_HDR_EXT_ID,
 		.IDE			= CANx_TX_HDR_IDE,

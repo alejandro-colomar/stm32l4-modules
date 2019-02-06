@@ -255,7 +255,7 @@ static	void	spi_gpio_init		(void)
 	GPIO_InitTypeDef	gpio;
 
 	SPIx_nSS_GPIO_CLK_ENABLE();
-	gpio	= (GPIO_InitTypeDef){
+	gpio	= (const GPIO_InitTypeDef){
 		.Pin		= SPIx_nSS_GPIO_PIN,
 		.Mode		= SPIx_nSS_GPIO_MODE,
 		.Pull		= SPIx_nSS_GPIO_PULL,
@@ -265,7 +265,7 @@ static	void	spi_gpio_init		(void)
 	HAL_GPIO_Init(SPIx_nSS_GPIO_PORT, &gpio);
 
 	SPIx_SCK_GPIO_CLK_ENABLE();
-	gpio	= (GPIO_InitTypeDef){
+	gpio	= (const GPIO_InitTypeDef){
 		.Pin		= SPIx_SCK_GPIO_PIN,
 		.Mode		= SPIx_SCK_GPIO_MODE,
 		.Pull		= SPIx_SCK_GPIO_PULL,
@@ -275,7 +275,7 @@ static	void	spi_gpio_init		(void)
 	HAL_GPIO_Init(SPIx_SCK_GPIO_PORT, &gpio);
 
 	SPIx_MISO_GPIO_CLK_ENABLE();
-	gpio	= (GPIO_InitTypeDef){
+	gpio	= (const GPIO_InitTypeDef){
 		.Pin		= SPIx_MISO_GPIO_PIN,
 		.Mode		= SPIx_MISO_GPIO_MODE,
 		.Pull		= SPIx_MISO_GPIO_PULL,
@@ -285,7 +285,7 @@ static	void	spi_gpio_init		(void)
 	HAL_GPIO_Init(SPIx_MISO_GPIO_PORT, &gpio);
 
 	SPIx_MOSI_GPIO_CLK_ENABLE();
-	gpio	= (GPIO_InitTypeDef){
+	gpio	= (const GPIO_InitTypeDef){
 		.Pin		= SPIx_MOSI_GPIO_PIN,
 		.Mode		= SPIx_MOSI_GPIO_MODE,
 		.Pull		= SPIx_MOSI_GPIO_PULL,
@@ -322,7 +322,7 @@ static	void	spi_nvic_deconf		(void)
 static	int	spi_peripherial_init	(void)
 {
 
-	spi	= (SPI_HandleTypeDef) {
+	spi	= (const SPI_HandleTypeDef){
 		.Instance	= SPIx_INSTANCE,
 		.Init		= {
 			.BaudRatePrescaler	= SPIx_INIT_BAUD_RATE_PRESCALER,

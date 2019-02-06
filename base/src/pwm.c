@@ -284,7 +284,7 @@ static	int	pwm_timx_tim_init		(uint32_t resolution_sec,
 								uint32_t period)
 {
 
-	tim	= (TIM_HandleTypeDef){
+	tim	= (const TIM_HandleTypeDef){
 		.Instance	= TIMx_INSTANCE,
 		.Init		= {
 			.Prescaler		= ((SystemCoreClock /
@@ -321,7 +321,7 @@ static	int	pwm_timx_master_conf		(void)
 static	void	pwm_timx_oc_conf		(void)
 {
 
-	oc_init	= (TIM_OC_InitTypeDef){
+	oc_init	= (const TIM_OC_InitTypeDef){
 		.OCMode		= TIM_OCMODE_PWM1,
 		.OCPolarity	= TIM_OCPOLARITY_HIGH,
 		.OCFastMode	= TIM_OCFAST_DISABLE,
